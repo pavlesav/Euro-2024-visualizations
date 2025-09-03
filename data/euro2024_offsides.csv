@@ -1,0 +1,16 @@
+id,index,period,timestamp,minute,second,type,possession,possession_team,play_pattern,team,player,position,location,duration,match_id,possession_team_id,team_id,player_id
+a0c33903-af2c-4db3-bc91-db42294f18f8,3698,2,00:43:24.436,88,24,Offside,124,France,Regular Play,Portugal,Cristiano Ronaldo dos Santos Aveiro,Center Forward,"[58.7, 22.4]",0.0,3942349,771,780,5207
+8f124dc3-5a43-4913-b461-06f6756b9083,988,1,00:21:00.794,21,0,Offside,27,Denmark,From Kick Off,Denmark,Joakim Mæhle,Right Wing Back,"[115.6, 57.0]",0.0,3930171,776,776,16554
+02f62687-5701-4a67-b11f-1e9984d19a07,2102,2,00:17:30.437,62,30,Offside,108,Netherlands,From Corner,Netherlands,Cody Mathès Gakpo,Left Wing,"[113.8, 40.2]",0.0,3941021,941,941,20750
+077d98a8-9600-4fe0-a552-802f2974537f,1189,1,00:25:19.513,25,19,Offside,37,Spain,From Throw In,Spain,Álvaro Borja Morata Martín,Center Forward,"[112.2, 23.3]",0.0,3941018,772,772,3477
+3897581f-e5bc-451a-8768-c6cf803bdaac,3186,2,00:30:38.458,75,38,Offside,124,Spain,Regular Play,Spain,Álvaro Borja Morata Martín,Center Forward,"[108.9, 50.6]",0.0,3930179,772,772,3477
+9bd67488-e916-45de-b359-2dc40cf465cb,3362,2,00:41:33.901,86,33,Offside,146,Denmark,Regular Play,Denmark,Victor Bernth Kristansen,Left Back,"[102.8, 6.0]",0.0,3940983,776,776,60343
+8e19d763-b874-47e7-942f-f580b4db8aff,2795,2,00:23:33.991,68,33,Offside,96,Netherlands,From Goal Kick,Netherlands,Denzel Dumfries,Right Back,"[116.1, 40.6]",0.0,3930173,941,941,8125
+eee220ec-4238-47c1-9b84-d535d9ba3f46,2969,2,00:33:39.738,78,39,Offside,101,Netherlands,From Corner,Netherlands,Wout Weghorst,Center Forward,"[113.7, 46.0]",0.0,3930173,941,941,7829
+a857e5f7-d26e-493a-9a40-eaa616ad45be,3426,2,00:41:25.808,86,25,Offside,152,Albania,Regular Play,Albania,Taulant Sulejmanov,Center Attacking Midfield,"[96.7, 21.0]",0.0,3930167,906,906,29531
+a3b7dd26-054e-4ab3-bfb6-b1bbb6fc0a97,3525,2,00:44:06.717,89,6,Offside,155,Albania,From Keeper,Albania,Mirlind Daku,Center Forward,"[111.5, 33.8]",0.0,3930167,906,906,54140
+4da02931-c533-4d72-a47e-262d4163d337,280,1,00:08:48.884,8,48,Offside,13,Albania,From Corner,Albania,Kristjan Asllani,Left Defensive Midfield,"[115.6, 16.4]",0.0,3930161,906,906,57303
+ec87f789-3d0a-4804-84bc-1fb6b92b3e07,3200,2,00:40:24.661,85,24,Offside,142,Slovakia,Regular Play,Ukraine,Roman Yaremchuk,Center Forward,"[99.1, 69.3]",0.95267,3938640,908,911,23649
+5573627f-4363-4fb8-a3c4-ba770b43e0f2,1223,1,00:26:34.218,26,34,Offside,48,Turkey,Regular Play,Turkey,Kenan Yildiz,Left Wing,"[117.4, 38.0]",0.0,3938639,909,909,151813
+f95af72b-d0a2-4300-9cfe-85c9fbdbb94d,2207,2,00:16:01.847,61,1,Offside,117,Romania,Regular Play,Belgium,Leandro Trossard,Right Wing,"[115.3, 5.9]",0.0,3930175,905,782,16559
+6b4e7c24-71d0-4466-9ea5-ebea543a3ca6,3236,2,00:34:05.494,79,5,Offside,147,Croatia,Other,Croatia,Ivan Perišić,Left Wing,"[112.3, 27.9]",0.0,3930160,785,785,5474

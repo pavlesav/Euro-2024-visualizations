@@ -1,0 +1,231 @@
+id,index,period,timestamp,minute,second,type,possession,possession_team,play_pattern,team,duration,related_events,match_id,possession_team_id,team_id
+fb2e0f15-aa3c-4a06-a11b-f16ae5804342,3,1,00:00:00.000,0,0,Half Start,1,Netherlands,Regular Play,Netherlands,0.0,['75fd7777-ef15-4fdc-abb1-1349fef334c1'],3942819,941,941
+75fd7777-ef15-4fdc-abb1-1349fef334c1,4,1,00:00:00.000,0,0,Half Start,1,Netherlands,Regular Play,England,0.0,['fb2e0f15-aa3c-4a06-a11b-f16ae5804342'],3942819,941,768
+c3297388-2725-4802-94e4-fa6e17c06ae2,1698,2,00:00:00.000,45,0,Half Start,50,England,From Goal Kick,Netherlands,0.0,['3e3599d1-e3fc-41df-a377-c1a833c6e3ec'],3942819,768,941
+3e3599d1-e3fc-41df-a377-c1a833c6e3ec,1699,2,00:00:00.000,45,0,Half Start,50,England,From Goal Kick,England,0.0,['c3297388-2725-4802-94e4-fa6e17c06ae2'],3942819,768,768
+d2126e70-9f04-4bb7-ba2b-9377836d1757,3,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,England,0.0,['54d78bfa-4146-42bd-acdc-97bcd393dd81'],3943043,772,768
+54d78bfa-4146-42bd-acdc-97bcd393dd81,4,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Spain,0.0,['d2126e70-9f04-4bb7-ba2b-9377836d1757'],3943043,772,772
+7230470a-8ceb-4eb8-a66f-d72a2afb12d6,1706,2,00:00:00.000,45,0,Half Start,79,Spain,Regular Play,England,0.0,['cb9ba06c-a673-448d-ab21-755d330fcadc'],3943043,772,768
+cb9ba06c-a673-448d-ab21-755d330fcadc,1707,2,00:00:00.000,45,0,Half Start,79,Spain,Regular Play,Spain,0.0,['7230470a-8ceb-4eb8-a66f-d72a2afb12d6'],3943043,772,772
+bba4f077-46e4-48d8-ad17-ecc3c0a299f4,3,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Spain,0.0,['8fcd40dd-0c42-4964-b578-4d6f07953bce'],3942752,772,772
+8fcd40dd-0c42-4964-b578-4d6f07953bce,4,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,France,0.0,['bba4f077-46e4-48d8-ad17-ecc3c0a299f4'],3942752,772,771
+22758d21-9898-4959-ba6d-ebd71d79e0fb,1558,2,00:00:00.000,45,0,Half Start,68,Spain,From Free Kick,France,0.0,['7b9d4ac8-dc12-4e47-a3fe-a2ccba4bb519'],3942752,772,771
+7b9d4ac8-dc12-4e47-a3fe-a2ccba4bb519,1559,2,00:00:00.000,45,0,Half Start,68,Spain,From Free Kick,Spain,0.0,['22758d21-9898-4959-ba6d-ebd71d79e0fb'],3942752,772,772
+f4d2f4a4-050e-4b04-a3a7-1c54284d00b7,3,1,00:00:00.000,0,0,Half Start,1,Netherlands,Regular Play,Netherlands,0.0,['8948093a-b31d-499a-825e-ca122b9b4ccc'],3942382,941,941
+8948093a-b31d-499a-825e-ca122b9b4ccc,4,1,00:00:00.000,0,0,Half Start,1,Netherlands,Regular Play,Turkey,0.0,['f4d2f4a4-050e-4b04-a3a7-1c54284d00b7'],3942382,941,909
+3c17995c-8b78-475c-bf88-0e1541ab6455,1870,2,00:00:00.000,45,0,Half Start,62,Turkey,Regular Play,Turkey,0.0,['fd609288-486d-4ad3-98e7-e1c5078d567c'],3942382,909,909
+fd609288-486d-4ad3-98e7-e1c5078d567c,1871,2,00:00:00.000,45,0,Half Start,62,Turkey,Regular Play,Netherlands,0.0,['3c17995c-8b78-475c-bf88-0e1541ab6455'],3942382,909,941
+2294fd5e-ff4c-4049-b528-a951e5f5c2d7,3,1,00:00:00.000,0,0,Half Start,1,Portugal,Regular Play,Portugal,0.0,['0932b6b7-6cad-4fd8-afaf-14161a11ac04'],3942349,780,780
+0932b6b7-6cad-4fd8-afaf-14161a11ac04,4,1,00:00:00.000,0,0,Half Start,1,Portugal,Regular Play,France,0.0,['2294fd5e-ff4c-4049-b528-a951e5f5c2d7'],3942349,780,771
+4ec5671d-8304-4e95-a1b5-3593d1748dfa,1956,2,00:00:00.000,45,0,Half Start,65,France,From Keeper,Portugal,0.0,['a3c914d8-0ba1-4094-bc1a-7df474900306'],3942349,771,780
+a3c914d8-0ba1-4094-bc1a-7df474900306,1957,2,00:00:00.000,45,0,Half Start,65,France,From Keeper,France,0.0,['4ec5671d-8304-4e95-a1b5-3593d1748dfa'],3942349,771,771
+60e28e3e-9197-49c2-adff-2876609a041a,3836,3,00:00:00.000,90,0,Half Start,133,Portugal,From Keeper,Portugal,0.0,['2563dac8-1565-4a02-a93e-60845e4049a3'],3942349,780,780
+2563dac8-1565-4a02-a93e-60845e4049a3,3837,3,00:00:00.000,90,0,Half Start,133,Portugal,From Keeper,France,0.0,['60e28e3e-9197-49c2-adff-2876609a041a'],3942349,780,771
+63d38e92-c444-414c-9baf-2dc5113afd32,4569,4,00:00:00.000,105,0,Half Start,150,France,From Goal Kick,France,0.0,['8b96d218-650b-45cb-9540-a8ea8f418b3f'],3942349,771,771
+8b96d218-650b-45cb-9540-a8ea8f418b3f,4570,4,00:00:00.000,105,0,Half Start,150,France,From Goal Kick,Portugal,0.0,['63d38e92-c444-414c-9baf-2dc5113afd32'],3942349,771,780
+0cb3dde1-cc0d-44da-bbf4-762f3cf14248,5169,5,00:00:00.000,120,0,Half Start,177,France,From Keeper,Portugal,0.0,['60185b7e-c881-44b2-8b8c-6791907e42b1'],3942349,771,780
+60185b7e-c881-44b2-8b8c-6791907e42b1,5170,5,00:00:00.000,120,0,Half Start,177,France,From Keeper,France,0.0,['0cb3dde1-cc0d-44da-bbf4-762f3cf14248'],3942349,771,771
+11f88a8e-9dcc-4709-a1e6-7a2e9ef0cd0c,3,1,00:00:00.000,0,0,Half Start,1,Netherlands,Regular Play,Netherlands,0.0,['da1e6ec2-b3f9-4870-a412-7fd13208c323'],3930180,941,941
+da1e6ec2-b3f9-4870-a412-7fd13208c323,4,1,00:00:00.000,0,0,Half Start,1,Netherlands,Regular Play,Austria,0.0,['11f88a8e-9dcc-4709-a1e6-7a2e9ef0cd0c'],3930180,941,915
+a4b954d0-4f9b-4e95-bab4-4ba251297235,1755,2,00:00:00.000,45,0,Half Start,76,Austria,From Corner,Netherlands,0.0,['f174e37f-6934-4538-8d65-f8a22b73fa30'],3930180,915,941
+f174e37f-6934-4538-8d65-f8a22b73fa30,1756,2,00:00:00.000,45,0,Half Start,76,Austria,From Corner,Austria,0.0,['a4b954d0-4f9b-4e95-bab4-4ba251297235'],3930180,915,915
+b564ba0b-eae4-434b-80a5-e7eb21d1f231,3,1,00:00:00.000,0,0,Half Start,1,Denmark,Regular Play,England,0.0,['85d3d214-fb4f-4357-ad30-30f6034e2b2f'],3930171,776,768
+85d3d214-fb4f-4357-ad30-30f6034e2b2f,4,1,00:00:00.000,0,0,Half Start,1,Denmark,Regular Play,Denmark,0.0,['b564ba0b-eae4-434b-80a5-e7eb21d1f231'],3930171,776,776
+7c0e670c-2f8a-4ba3-ab3a-dd5ef581bea6,2009,2,00:00:00.000,45,0,Half Start,63,England,From Keeper,England,0.0,['12484fa2-fdda-4cce-b2ed-1f270202e5de'],3930171,768,768
+12484fa2-fdda-4cce-b2ed-1f270202e5de,2010,2,00:00:00.000,45,0,Half Start,63,England,From Keeper,Denmark,0.0,['7c0e670c-2f8a-4ba3-ab3a-dd5ef581bea6'],3930171,768,776
+79b1656e-29c9-4e4b-bb4f-29f7ead03ec8,3,1,00:00:00.000,0,0,Half Start,1,England,Regular Play,England,0.0,['b53c5d29-ad4c-4986-9ee5-f04b1c9c2f34'],3942227,768,768
+b53c5d29-ad4c-4986-9ee5-f04b1c9c2f34,4,1,00:00:00.000,0,0,Half Start,1,England,Regular Play,Switzerland,0.0,['79b1656e-29c9-4e4b-bb4f-29f7ead03ec8'],3942227,768,773
+dc6bcdf2-4648-4333-8a8d-8cbdd85d7739,1938,2,00:00:00.000,45,0,Half Start,60,Switzerland,From Keeper,Switzerland,0.0,['915fd508-b2bd-4adf-bde3-af1b40e41195'],3942227,773,773
+915fd508-b2bd-4adf-bde3-af1b40e41195,1939,2,00:00:00.000,45,0,Half Start,60,Switzerland,From Keeper,England,0.0,['dc6bcdf2-4648-4333-8a8d-8cbdd85d7739'],3942227,773,768
+90cdf9be-ca55-4ccb-8076-a97c9ab17e01,3654,3,00:00:00.000,90,0,Half Start,129,Switzerland,Regular Play,Switzerland,0.0,['ed9c1ed1-f0b2-4550-ab41-fe756c7d6842'],3942227,773,773
+ed9c1ed1-f0b2-4550-ab41-fe756c7d6842,3655,3,00:00:00.000,90,0,Half Start,129,Switzerland,Regular Play,England,0.0,['90cdf9be-ca55-4ccb-8076-a97c9ab17e01'],3942227,773,768
+4a1fd1cc-c61b-4f96-9ed7-51bcf3792494,4293,4,00:00:00.000,105,0,Half Start,144,Switzerland,Regular Play,England,0.0,['7369fe30-726b-46e1-95a9-f1458ad68367'],3942227,773,768
+7369fe30-726b-46e1-95a9-f1458ad68367,4294,4,00:00:00.000,105,0,Half Start,144,Switzerland,Regular Play,Switzerland,0.0,['4a1fd1cc-c61b-4f96-9ed7-51bcf3792494'],3942227,773,773
+5468ae64-0edc-426d-92d2-6781d6682c3f,4861,5,00:00:00.000,120,0,Half Start,160,England,From Goal Kick,Switzerland,0.0,['98fa9ed9-b2f4-4418-b600-acad3be6895c'],3942227,768,773
+98fa9ed9-b2f4-4418-b600-acad3be6895c,4862,5,00:00:00.000,120,0,Half Start,160,England,From Goal Kick,England,0.0,['5468ae64-0edc-426d-92d2-6781d6682c3f'],3942227,768,768
+a6229c43-8030-4e79-a63d-8fc75e40b3b5,3,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Germany,0.0,['012dca26-712a-4b7a-be43-1b15121b6ed4'],3942226,772,770
+012dca26-712a-4b7a-be43-1b15121b6ed4,4,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Spain,0.0,['a6229c43-8030-4e79-a63d-8fc75e40b3b5'],3942226,772,772
+d1e800c2-12e2-4c03-bbfb-edb69f819042,1702,2,00:00:00.000,45,0,Half Start,73,Germany,From Free Kick,Germany,0.0,['89dcd6d8-a104-4415-98a3-311095f76422'],3942226,770,770
+89dcd6d8-a104-4415-98a3-311095f76422,1703,2,00:00:00.000,45,0,Half Start,73,Germany,From Free Kick,Spain,0.0,['d1e800c2-12e2-4c03-bbfb-edb69f819042'],3942226,770,772
+84075f5f-7d9d-4878-99cb-9d671e5bb98e,3357,3,00:00:00.000,90,0,Half Start,158,Germany,From Free Kick,Germany,0.0,['f1687a60-81c5-44b7-adec-5471376007d8'],3942226,770,770
+f1687a60-81c5-44b7-adec-5471376007d8,3358,3,00:00:00.000,90,0,Half Start,158,Germany,From Free Kick,Spain,0.0,['84075f5f-7d9d-4878-99cb-9d671e5bb98e'],3942226,770,772
+966fbfec-3396-493d-8f45-493b2efc18af,3953,4,00:00:00.000,105,0,Half Start,182,Spain,From Goal Kick,Germany,0.0,['8fcb74ad-2941-4808-843e-97aa0807fc4b'],3942226,772,770
+8fcb74ad-2941-4808-843e-97aa0807fc4b,3954,4,00:00:00.000,105,0,Half Start,182,Spain,From Goal Kick,Spain,0.0,['966fbfec-3396-493d-8f45-493b2efc18af'],3942226,772,772
+9dd830e5-b007-4b28-b529-8fd7dc188f77,3,1,00:00:00.000,0,0,Half Start,1,Ukraine,Regular Play,Belgium,0.0,['4667de25-d35b-4cdb-8d0a-263c5a4fad58'],3938645,911,782
+4667de25-d35b-4cdb-8d0a-263c5a4fad58,4,1,00:00:00.000,0,0,Half Start,1,Ukraine,Regular Play,Ukraine,0.0,['9dd830e5-b007-4b28-b529-8fd7dc188f77'],3938645,911,911
+1a3f8ff1-8ad8-4767-b8ee-8ff83b19d531,1836,2,00:00:00.000,45,0,Half Start,77,Ukraine,Regular Play,Belgium,0.0,['a18c7103-c3e4-45bf-915f-a36c1cdff883'],3938645,911,782
+a18c7103-c3e4-45bf-915f-a36c1cdff883,1837,2,00:00:00.000,45,0,Half Start,77,Ukraine,Regular Play,Ukraine,0.0,['1a3f8ff1-8ad8-4767-b8ee-8ff83b19d531'],3938645,911,911
+ca4b08e9-4168-4b07-9454-769cc7f250b7,3,1,00:00:00.000,0,0,Half Start,1,Czech Republic,Regular Play,Turkey,0.0,['f2b03e5a-060f-4cd9-b309-da7b4709ba01'],3930184,912,909
+f2b03e5a-060f-4cd9-b309-da7b4709ba01,4,1,00:00:00.000,0,0,Half Start,1,Czech Republic,Regular Play,Czech Republic,0.0,['ca4b08e9-4168-4b07-9454-769cc7f250b7'],3930184,912,912
+60c5557c-4345-4c18-973f-d381347751c1,1650,2,00:00:00.000,45,0,Half Start,77,Turkey,From Throw In,Turkey,0.0,['98afb643-9ad8-4d42-926b-20ec0b87843c'],3930184,909,909
+98afb643-9ad8-4d42-926b-20ec0b87843c,1651,2,00:00:00.000,45,0,Half Start,77,Turkey,From Throw In,Czech Republic,0.0,['60c5557c-4345-4c18-973f-d381347751c1'],3930184,909,912
+87c7628d-b636-4d01-a6ad-b91d2c15a689,3,1,00:00:00.000,0,0,Half Start,1,Austria,Regular Play,Turkey,0.0,['5a68dc00-d9be-42c9-9e24-b70b87e5c6a6'],3941022,915,909
+5a68dc00-d9be-42c9-9e24-b70b87e5c6a6,4,1,00:00:00.000,0,0,Half Start,1,Austria,Regular Play,Austria,0.0,['87c7628d-b636-4d01-a6ad-b91d2c15a689'],3941022,915,915
+a307a0e4-c564-476a-9e45-51432838b811,1882,2,00:00:00.000,45,0,Half Start,75,Austria,Regular Play,Austria,0.0,['1278dfac-1d84-4040-b74d-a1dc7e99d9c2'],3941022,915,915
+1278dfac-1d84-4040-b74d-a1dc7e99d9c2,1883,2,00:00:00.000,45,0,Half Start,75,Austria,Regular Play,Turkey,0.0,['a307a0e4-c564-476a-9e45-51432838b811'],3941022,915,909
+a04c375d-8b61-4828-b916-05daae45aba4,3,1,00:00:00.000,0,0,Half Start,1,Romania,Regular Play,Netherlands,0.0,['d0e15818-65ee-451b-8181-b0da766feaed'],3941021,905,941
+d0e15818-65ee-451b-8181-b0da766feaed,4,1,00:00:00.000,0,0,Half Start,1,Romania,Regular Play,Romania,0.0,['a04c375d-8b61-4828-b916-05daae45aba4'],3941021,905,905
+7e91c760-841c-4253-9af8-25588d219a04,1537,2,00:00:00.000,45,0,Half Start,75,Romania,From Corner,Romania,0.0,['022d1e45-d202-45e0-9fa3-df865c2e79cd'],3941021,905,905
+022d1e45-d202-45e0-9fa3-df865c2e79cd,1538,2,00:00:00.000,45,0,Half Start,75,Romania,From Corner,Netherlands,0.0,['7e91c760-841c-4253-9af8-25588d219a04'],3941021,905,941
+f7161feb-ebbc-4c2f-a552-559fd7fba329,3,1,00:00:00.000,0,0,Half Start,1,Portugal,Regular Play,Portugal,0.0,['c5edbb47-4cd6-4da8-b8c1-a6d5ce8eee5a'],3941020,780,780
+c5edbb47-4cd6-4da8-b8c1-a6d5ce8eee5a,4,1,00:00:00.000,0,0,Half Start,1,Portugal,Regular Play,Slovenia,0.0,['f7161feb-ebbc-4c2f-a552-559fd7fba329'],3941020,780,944
+30b1707e-0b3a-4000-af8a-c764235d7241,1574,2,00:00:00.000,45,0,Half Start,84,Portugal,Regular Play,Portugal,0.0,['32452764-76b9-40c3-8dc5-420f3628e707'],3941020,780,780
+32452764-76b9-40c3-8dc5-420f3628e707,1575,2,00:00:00.000,45,0,Half Start,84,Portugal,Regular Play,Slovenia,0.0,['30b1707e-0b3a-4000-af8a-c764235d7241'],3941020,780,944
+7fb7178d-52ee-4c4d-a301-8c4ab43be2c2,3229,3,00:00:00.000,90,0,Half Start,160,Portugal,From Corner,Portugal,0.0,['e98d6acb-f64b-404e-b6ee-290702660b09'],3941020,780,780
+e98d6acb-f64b-404e-b6ee-290702660b09,3230,3,00:00:00.000,90,0,Half Start,160,Portugal,From Corner,Slovenia,0.0,['7fb7178d-52ee-4c4d-a301-8c4ab43be2c2'],3941020,780,944
+b96ae0c3-06de-4d8e-b2eb-83912e899c64,3702,4,00:00:00.000,105,0,Half Start,187,Portugal,From Corner,Portugal,0.0,['5530709c-21d3-470b-bc30-a4c5ccd03f7d'],3941020,780,780
+5530709c-21d3-470b-bc30-a4c5ccd03f7d,3703,4,00:00:00.000,105,0,Half Start,187,Portugal,From Corner,Slovenia,0.0,['b96ae0c3-06de-4d8e-b2eb-83912e899c64'],3941020,780,944
+5d32e48c-0b6d-4589-8df6-4bf0fb8d13fc,4206,5,00:00:00.000,120,0,Half Start,214,Portugal,From Throw In,Portugal,0.0,['6841ad21-0a07-40c2-86f0-7eff4fac6711'],3941020,780,780
+6841ad21-0a07-40c2-86f0-7eff4fac6711,4207,5,00:00:00.000,120,0,Half Start,214,Portugal,From Throw In,Slovenia,0.0,['5d32e48c-0b6d-4589-8df6-4bf0fb8d13fc'],3941020,780,944
+b55a6fcd-7779-41e5-b445-de7e30e2e607,3,1,00:00:00.000,0,0,Half Start,1,France,Regular Play,France,0.0,['99b61dd3-caa3-4005-bfb1-c29fb966bbb9'],3941019,771,771
+99b61dd3-caa3-4005-bfb1-c29fb966bbb9,4,1,00:00:00.000,0,0,Half Start,1,France,Regular Play,Belgium,0.0,['b55a6fcd-7779-41e5-b445-de7e30e2e607'],3941019,771,782
+542f87dd-9d82-4d41-9e29-d4467cf02a78,2005,2,00:00:00.000,45,0,Half Start,60,Belgium,From Goal Kick,France,0.0,['c6a372b4-002e-4370-a3e5-330106354ad4'],3941019,782,771
+c6a372b4-002e-4370-a3e5-330106354ad4,2006,2,00:00:00.000,45,0,Half Start,60,Belgium,From Goal Kick,Belgium,0.0,['542f87dd-9d82-4d41-9e29-d4467cf02a78'],3941019,782,782
+a4a34b1c-7f4f-492a-9400-10cfee591148,3,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Georgia,0.0,['3ca54510-4339-4e5d-a8d9-d269d3fc1466'],3941018,772,2138
+3ca54510-4339-4e5d-a8d9-d269d3fc1466,4,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Spain,0.0,['a4a34b1c-7f4f-492a-9400-10cfee591148'],3941018,772,772
+b1ea73c8-a859-4aac-847e-803602bc59ba,1974,2,00:00:00.000,45,0,Half Start,77,Spain,From Corner,Spain,0.0,['f366034d-eb60-4d4d-a96a-9a930999a2ab'],3941018,772,772
+f366034d-eb60-4d4d-a96a-9a930999a2ab,1975,2,00:00:00.000,45,0,Half Start,77,Spain,From Corner,Georgia,0.0,['b1ea73c8-a859-4aac-847e-803602bc59ba'],3941018,772,2138
+b149f00f-3194-4df5-bb55-d8e2cb61cb0d,3,1,00:00:00.000,0,0,Half Start,1,England,Regular Play,England,0.0,['6213884a-ac80-4230-85a5-6d005bc3e3e4'],3941017,768,768
+6213884a-ac80-4230-85a5-6d005bc3e3e4,4,1,00:00:00.000,0,0,Half Start,1,England,Regular Play,Slovakia,0.0,['b149f00f-3194-4df5-bb55-d8e2cb61cb0d'],3941017,768,908
+c9da6222-bc74-4cff-973e-7424e23c9f16,1833,2,00:00:00.000,45,0,Half Start,62,England,From Corner,England,0.0,['7d12e9b1-2eff-41fa-aa11-c42ebf162b19'],3941017,768,768
+7d12e9b1-2eff-41fa-aa11-c42ebf162b19,1834,2,00:00:00.000,45,0,Half Start,62,England,From Corner,Slovakia,0.0,['c9da6222-bc74-4cff-973e-7424e23c9f16'],3941017,768,908
+84bd4675-63a8-4d84-81f6-1b1c6bb67251,3666,3,00:00:00.000,90,0,Half Start,143,Slovakia,From Kick Off,Slovakia,0.0,['cc335ed2-bddf-4a34-8523-b6e6c0260a98'],3941017,908,908
+cc335ed2-bddf-4a34-8523-b6e6c0260a98,3667,3,00:00:00.000,90,0,Half Start,143,Slovakia,From Kick Off,England,0.0,['84bd4675-63a8-4d84-81f6-1b1c6bb67251'],3941017,908,768
+962463cc-3416-4b38-be60-4d727cfe4d17,4260,4,00:00:00.000,105,0,Half Start,168,Slovakia,Regular Play,England,0.0,['40efa6e2-a8b3-4c47-a1b9-f2ff36f66850'],3941017,908,768
+40efa6e2-a8b3-4c47-a1b9-f2ff36f66850,4261,4,00:00:00.000,105,0,Half Start,168,Slovakia,Regular Play,Slovakia,0.0,['962463cc-3416-4b38-be60-4d727cfe4d17'],3941017,908,908
+442b07ce-3a31-4a17-bfd3-2d3a62b8c38c,3,1,00:00:00.000,0,0,Half Start,1,Denmark,Regular Play,Serbia,0.0,['c825ecee-e678-4e01-8c14-1f4f18ea2af9'],3930182,776,786
+c825ecee-e678-4e01-8c14-1f4f18ea2af9,4,1,00:00:00.000,0,0,Half Start,1,Denmark,Regular Play,Denmark,0.0,['442b07ce-3a31-4a17-bfd3-2d3a62b8c38c'],3930182,776,776
+95fd8ecd-aa0a-49e2-b211-951ab0ef7ca8,2060,2,00:00:00.000,45,0,Half Start,77,Denmark,From Throw In,Denmark,0.0,['9d438fc8-372e-4082-a239-654353525e02'],3930182,776,776
+9d438fc8-372e-4082-a239-654353525e02,2061,2,00:00:00.000,45,0,Half Start,77,Denmark,From Throw In,Serbia,0.0,['95fd8ecd-aa0a-49e2-b211-951ab0ef7ca8'],3930182,776,786
+28cec252-8891-4a29-a54f-bd9fc860a471,3,1,00:00:00.000,0,0,Half Start,1,Albania,Regular Play,Spain,0.0,['7121f798-796f-4fda-a0ec-f07e9709d66c'],3930179,906,772
+7121f798-796f-4fda-a0ec-f07e9709d66c,4,1,00:00:00.000,0,0,Half Start,1,Albania,Regular Play,Albania,0.0,['28cec252-8891-4a29-a54f-bd9fc860a471'],3930179,906,906
+639f1d11-2757-4747-8af5-f38adb0ac6dc,1785,2,00:00:00.000,45,0,Half Start,74,Albania,From Goal Kick,Spain,0.0,['f2273b78-155b-46fa-8b28-680ee6dd04cb'],3930179,906,772
+f2273b78-155b-46fa-8b28-680ee6dd04cb,1786,2,00:00:00.000,45,0,Half Start,74,Albania,From Goal Kick,Albania,0.0,['639f1d11-2757-4747-8af5-f38adb0ac6dc'],3930179,906,906
+6d326943-ffba-47af-8997-5a1339f44d6b,3,1,00:00:00.000,0,0,Half Start,1,Germany,Regular Play,Germany,0.0,['e7688f37-1704-4253-ac01-c768e044d779'],3940983,770,770
+e7688f37-1704-4253-ac01-c768e044d779,4,1,00:00:00.000,0,0,Half Start,1,Germany,Regular Play,Denmark,0.0,['6d326943-ffba-47af-8997-5a1339f44d6b'],3940983,770,776
+503a7df3-cf85-4970-9ddd-cd39e7463efe,1935,2,00:00:00.000,45,0,Half Start,82,Germany,From Keeper,Germany,0.0,['82413e14-d8d0-43dd-ab21-b1ad7d3f9e75'],3940983,770,770
+82413e14-d8d0-43dd-ab21-b1ad7d3f9e75,1936,2,00:00:00.000,45,0,Half Start,82,Germany,From Keeper,Denmark,0.0,['503a7df3-cf85-4970-9ddd-cd39e7463efe'],3940983,770,776
+4236ed37-e847-4db8-8d20-9d5f32101998,3,1,00:00:00.000,0,0,Half Start,1,Switzerland,Regular Play,Italy,0.0,['7b5349c1-8473-4b31-880d-67ff7d157082'],3940878,773,914
+7b5349c1-8473-4b31-880d-67ff7d157082,4,1,00:00:00.000,0,0,Half Start,1,Switzerland,Regular Play,Switzerland,0.0,['4236ed37-e847-4db8-8d20-9d5f32101998'],3940878,773,773
+df57883d-c4d0-49d1-a368-82792abc6f59,1853,2,00:00:00.000,45,0,Half Start,71,Italy,From Free Kick,Italy,0.0,['7a8b385d-7c6d-4076-b216-7d4880a17c07'],3940878,914,914
+7a8b385d-7c6d-4076-b216-7d4880a17c07,1854,2,00:00:00.000,45,0,Half Start,71,Italy,From Free Kick,Switzerland,0.0,['df57883d-c4d0-49d1-a368-82792abc6f59'],3940878,914,773
+52edaf28-68f3-412e-9481-acc6b09eabf7,3,1,00:00:00.000,0,0,Half Start,1,Scotland,Regular Play,Scotland,0.0,['d1a51dcb-a114-4994-bbaf-9d36d69880bd'],3930177,942,942
+d1a51dcb-a114-4994-bbaf-9d36d69880bd,4,1,00:00:00.000,0,0,Half Start,1,Scotland,Regular Play,Hungary,0.0,['52edaf28-68f3-412e-9481-acc6b09eabf7'],3930177,942,916
+443822ce-b824-4089-8a45-e7c9327a7499,1708,2,00:00:00.000,45,0,Half Start,71,Hungary,Regular Play,Scotland,0.0,['8ee2ff89-2901-45a3-ba15-1837030c07c7'],3930177,916,942
+8ee2ff89-2901-45a3-ba15-1837030c07c7,1709,2,00:00:00.000,45,0,Half Start,71,Hungary,Regular Play,Hungary,0.0,['443822ce-b824-4089-8a45-e7c9327a7499'],3930177,916,916
+ac1504e1-3263-4260-84a6-fd4b4a2853ad,3,1,00:00:00.000,0,0,Half Start,1,Netherlands,Regular Play,Netherlands,0.0,['e0e6801b-ffbc-463e-b3cc-22409ac7d701'],3930173,941,941
+e0e6801b-ffbc-463e-b3cc-22409ac7d701,4,1,00:00:00.000,0,0,Half Start,1,Netherlands,Regular Play,France,0.0,['ac1504e1-3263-4260-84a6-fd4b4a2853ad'],3930173,941,771
+405f3310-4be3-47cf-991c-7ba721b07e33,1901,2,00:00:00.000,45,0,Half Start,67,France,From Throw In,France,0.0,['3d0904f1-1943-41de-81cf-66fa9a8ba6fa'],3930173,771,771
+3d0904f1-1943-41de-81cf-66fa9a8ba6fa,1902,2,00:00:00.000,45,0,Half Start,67,France,From Throw In,Netherlands,0.0,['405f3310-4be3-47cf-991c-7ba721b07e33'],3930173,771,941
+37ec918b-ab55-4fd9-8a8d-1e7f4fddabec,3,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Spain,0.0,['bf7e0372-5a1e-497a-8199-efdefefbc7ea'],3930172,772,772
+bf7e0372-5a1e-497a-8199-efdefefbc7ea,4,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Italy,0.0,['37ec918b-ab55-4fd9-8a8d-1e7f4fddabec'],3930172,772,914
+6ca98d6e-4fea-49a3-b3db-8b1b0dacfbec,2002,2,00:00:00.000,45,0,Half Start,83,Italy,Regular Play,Spain,0.0,['9fa4c1b4-2288-4803-9d37-85f009156e21'],3930172,914,772
+9fa4c1b4-2288-4803-9d37-85f009156e21,2003,2,00:00:00.000,45,0,Half Start,83,Italy,Regular Play,Italy,0.0,['6ca98d6e-4fea-49a3-b3db-8b1b0dacfbec'],3930172,914,914
+a498bd8d-52c3-467a-a204-2d9aa8978ad8,3,1,00:00:00.000,0,0,Half Start,1,Croatia,Regular Play,Croatia,0.0,['5de33bb8-69c8-4b09-9e8b-a8cdccc9dcda'],3930167,785,785
+5de33bb8-69c8-4b09-9e8b-a8cdccc9dcda,4,1,00:00:00.000,0,0,Half Start,1,Croatia,Regular Play,Albania,0.0,['a498bd8d-52c3-467a-a204-2d9aa8978ad8'],3930167,785,906
+bc5a6234-d186-4dd3-81bd-b7e9ef054aa1,1863,2,00:00:00.000,45,0,Half Start,72,Croatia,From Keeper,Albania,0.0,['d9813940-bed6-4128-9f2a-427c45bb6f03'],3930167,785,906
+d9813940-bed6-4128-9f2a-427c45bb6f03,1864,2,00:00:00.000,45,0,Half Start,72,Croatia,From Keeper,Croatia,0.0,['bc5a6234-d186-4dd3-81bd-b7e9ef054aa1'],3930167,785,785
+0770b3e7-6679-46ab-ab5f-41959b055f0c,3,1,00:00:00.000,0,0,Half Start,1,Germany,Regular Play,Hungary,0.0,['da630563-eb26-4b03-a637-a6fe704e37d1'],3930168,770,916
+da630563-eb26-4b03-a637-a6fe704e37d1,4,1,00:00:00.000,0,0,Half Start,1,Germany,Regular Play,Germany,0.0,['0770b3e7-6679-46ab-ab5f-41959b055f0c'],3930168,770,770
+61fd7c92-e004-454a-9de0-b36e6f316e56,1973,2,00:00:00.000,45,0,Half Start,70,Germany,From Free Kick,Germany,0.0,['fad972fc-0d3a-4455-b6a1-18d0f7ef2c13'],3930168,770,770
+fad972fc-0d3a-4455-b6a1-18d0f7ef2c13,1974,2,00:00:00.000,45,0,Half Start,70,Germany,From Free Kick,Hungary,0.0,['61fd7c92-e004-454a-9de0-b36e6f316e56'],3930168,770,916
+ff96ad42-3c72-49ae-b0d5-e5741f6cf470,3,1,00:00:00.000,0,0,Half Start,1,Austria,Regular Play,France,0.0,['f5d525d2-0f4b-4f15-9163-dda47bcf0244'],3930165,915,771
+f5d525d2-0f4b-4f15-9163-dda47bcf0244,4,1,00:00:00.000,0,0,Half Start,1,Austria,Regular Play,Austria,0.0,['ff96ad42-3c72-49ae-b0d5-e5741f6cf470'],3930165,915,915
+3a6d581c-1023-4e49-b3ba-6c6b5ce36074,1878,2,00:00:00.000,45,0,Half Start,90,Austria,From Keeper,France,0.0,['703b4b04-df3f-4957-852d-c29ccb2898ee'],3930165,915,771
+703b4b04-df3f-4957-852d-c29ccb2898ee,1879,2,00:00:00.000,45,0,Half Start,90,Austria,From Keeper,Austria,0.0,['3a6d581c-1023-4e49-b3ba-6c6b5ce36074'],3930165,915,915
+5bcbdd48-96ad-44a0-8090-89c42f0a3bcf,3,1,00:00:00.000,0,0,Half Start,1,Belgium,Regular Play,Slovakia,0.0,['7323f9db-3f72-452f-8562-a76b0cac9228'],3930164,782,908
+7323f9db-3f72-452f-8562-a76b0cac9228,4,1,00:00:00.000,0,0,Half Start,1,Belgium,Regular Play,Belgium,0.0,['5bcbdd48-96ad-44a0-8090-89c42f0a3bcf'],3930164,782,782
+7a6bd617-2642-4b20-8c8c-08010f2b6af4,1763,2,00:00:00.000,45,0,Half Start,87,Slovakia,From Corner,Slovakia,0.0,['c3dc1a8a-5b68-400f-8c73-c593026cdc93'],3930164,908,908
+c3dc1a8a-5b68-400f-8c73-c593026cdc93,1764,2,00:00:00.000,45,0,Half Start,87,Slovakia,From Corner,Belgium,0.0,['7a6bd617-2642-4b20-8c8c-08010f2b6af4'],3930164,908,782
+84726dc1-617e-4a80-9d88-d967224cb9c9,3,1,00:00:00.000,0,0,Half Start,1,Italy,Regular Play,Albania,0.0,['6fd413db-8651-4cc0-be90-29ab6cad3133'],3930161,914,906
+6fd413db-8651-4cc0-be90-29ab6cad3133,4,1,00:00:00.000,0,0,Half Start,1,Italy,Regular Play,Italy,0.0,['84726dc1-617e-4a80-9d88-d967224cb9c9'],3930161,914,914
+66678c64-db23-405c-8217-0b3d29f783c2,1941,2,00:00:00.000,45,0,Half Start,64,Italy,From Throw In,Albania,0.0,['bc0f5fe3-d28e-4057-81d2-a13fecabd8e2'],3930161,914,906
+bc0f5fe3-d28e-4057-81d2-a13fecabd8e2,1942,2,00:00:00.000,45,0,Half Start,64,Italy,From Throw In,Italy,0.0,['66678c64-db23-405c-8217-0b3d29f783c2'],3930161,914,914
+ff18fc34-673e-4677-81ab-346a8148624d,3,1,00:00:00.000,0,0,Half Start,1,Poland,Regular Play,Netherlands,0.0,['006e8d10-d2d7-49b2-bef1-d9573cb3823b'],3938637,789,941
+006e8d10-d2d7-49b2-bef1-d9573cb3823b,4,1,00:00:00.000,0,0,Half Start,1,Poland,Regular Play,Poland,0.0,['ff18fc34-673e-4677-81ab-346a8148624d'],3938637,789,789
+8ba9fa50-864a-4dd9-805e-a52acad3c100,1759,2,00:00:00.000,45,0,Half Start,68,Netherlands,Regular Play,Poland,0.0,['5464ac46-2251-4209-acb3-94950ec62407'],3938637,941,789
+5464ac46-2251-4209-acb3-94950ec62407,1760,2,00:00:00.000,45,0,Half Start,68,Netherlands,Regular Play,Netherlands,0.0,['8ba9fa50-864a-4dd9-805e-a52acad3c100'],3938637,941,941
+40974614-3225-47a8-84cb-f912bd961ac8,3,1,00:00:00.000,0,0,Half Start,1,Slovakia,Regular Play,Slovakia,0.0,['e10a7764-aab8-4c64-b8cc-c2b6b25e5819'],3938640,908,908
+e10a7764-aab8-4c64-b8cc-c2b6b25e5819,4,1,00:00:00.000,0,0,Half Start,1,Slovakia,Regular Play,Ukraine,0.0,['40974614-3225-47a8-84cb-f912bd961ac8'],3938640,908,911
+11bb088b-5ea1-4557-8d6f-bc8ecdbe92ff,1824,2,00:00:00.000,45,0,Half Start,70,Ukraine,Regular Play,Slovakia,0.0,['ee404b40-1257-43b0-a140-f003f25789e1'],3938640,911,908
+ee404b40-1257-43b0-a140-f003f25789e1,1825,2,00:00:00.000,45,0,Half Start,70,Ukraine,Regular Play,Ukraine,0.0,['11bb088b-5ea1-4557-8d6f-bc8ecdbe92ff'],3938640,911,911
+2f066a0f-c32f-4cf0-bc98-9c0994c70797,3,1,00:00:00.000,0,0,Half Start,1,Georgia,Regular Play,Georgia,0.0,['f7cd34c4-f643-4f4b-8eb9-44a3ebc64ae6'],3938642,2138,2138
+f7cd34c4-f643-4f4b-8eb9-44a3ebc64ae6,4,1,00:00:00.000,0,0,Half Start,1,Georgia,Regular Play,Czech Republic,0.0,['2f066a0f-c32f-4cf0-bc98-9c0994c70797'],3938642,2138,912
+5959954b-94b6-42ce-b310-d5028c8da0a7,1612,2,00:00:00.000,45,0,Half Start,81,Czech Republic,From Corner,Georgia,0.0,['03137ef3-a381-4837-95b0-ce65b910a63d'],3938642,912,2138
+03137ef3-a381-4837-95b0-ce65b910a63d,1613,2,00:00:00.000,45,0,Half Start,81,Czech Republic,From Corner,Czech Republic,0.0,['5959954b-94b6-42ce-b310-d5028c8da0a7'],3938642,912,912
+ee249fe6-7de9-4e0f-9b13-baf0822f5f77,3,1,00:00:00.000,0,0,Half Start,1,Turkey,Regular Play,Georgia,0.0,['b017db95-449e-4ad3-b7af-362d5231cbaf'],3938639,909,2138
+b017db95-449e-4ad3-b7af-362d5231cbaf,4,1,00:00:00.000,0,0,Half Start,1,Turkey,Regular Play,Turkey,0.0,['ee249fe6-7de9-4e0f-9b13-baf0822f5f77'],3938639,909,909
+e92155cb-7205-4069-a3fe-64ed57f57c5d,1965,2,00:00:00.000,45,0,Half Start,73,Turkey,Regular Play,Turkey,0.0,['bf990d58-7c7e-4e23-bf1c-6e1be1d64996'],3938639,909,909
+bf990d58-7c7e-4e23-bf1c-6e1be1d64996,1966,2,00:00:00.000,45,0,Half Start,73,Turkey,Regular Play,Georgia,0.0,['e92155cb-7205-4069-a3fe-64ed57f57c5d'],3938639,909,2138
+aee4c17a-4a3c-413e-abc1-a13e7593f541,3,1,00:00:00.000,0,0,Half Start,1,Poland,Regular Play,Poland,0.0,['3ae4aa14-7882-467a-85e1-7b09c723025a'],3938641,789,789
+3ae4aa14-7882-467a-85e1-7b09c723025a,4,1,00:00:00.000,0,0,Half Start,1,Poland,Regular Play,Austria,0.0,['aee4c17a-4a3c-413e-abc1-a13e7593f541'],3938641,789,915
+f59ae6be-137c-4efd-9269-97e4bdd643d0,1806,2,00:00:00.000,45,0,Half Start,92,Poland,From Corner,Austria,0.0,['0999c9cb-29ec-4b51-9c40-53d57b99f957'],3938641,789,915
+0999c9cb-29ec-4b51-9c40-53d57b99f957,1807,2,00:00:00.000,45,0,Half Start,92,Poland,From Corner,Poland,0.0,['f59ae6be-137c-4efd-9269-97e4bdd643d0'],3938641,789,789
+153f66b8-a970-46e9-ae3e-be0c3adb9910,3,1,00:00:00.000,0,0,Half Start,1,Georgia,Regular Play,Georgia,0.0,['7c5b25ca-beb2-4094-94cc-6db8c7c0205b'],3938644,2138,2138
+7c5b25ca-beb2-4094-94cc-6db8c7c0205b,4,1,00:00:00.000,0,0,Half Start,1,Georgia,Regular Play,Portugal,0.0,['153f66b8-a970-46e9-ae3e-be0c3adb9910'],3938644,2138,780
+a841d838-fa0c-478e-83d8-4ebc0d0915bc,2039,2,00:00:00.000,45,0,Half Start,77,Portugal,Regular Play,Georgia,0.0,['fe10c865-011b-4179-a0a5-f4ef7d3f3f70'],3938644,780,2138
+fe10c865-011b-4179-a0a5-f4ef7d3f3f70,2040,2,00:00:00.000,45,0,Half Start,77,Portugal,Regular Play,Portugal,0.0,['a841d838-fa0c-478e-83d8-4ebc0d0915bc'],3938644,780,780
+e4b27a22-b247-4eeb-b0ba-b1b81939e89c,3,1,00:00:00.000,0,0,Half Start,1,France,Regular Play,Poland,0.0,['a1411d49-c9e4-4d5d-9900-2af4c11aa0b4'],3938643,771,789
+a1411d49-c9e4-4d5d-9900-2af4c11aa0b4,4,1,00:00:00.000,0,0,Half Start,1,France,Regular Play,France,0.0,['e4b27a22-b247-4eeb-b0ba-b1b81939e89c'],3938643,771,771
+c1cbeb10-8810-43db-be41-6fdc2edf2ae5,1929,2,00:00:00.000,45,0,Half Start,80,France,From Free Kick,France,0.0,['0a8bfa44-70fb-411e-8834-e827ae873089'],3938643,771,771
+0a8bfa44-70fb-411e-8834-e827ae873089,1930,2,00:00:00.000,45,0,Half Start,80,France,From Free Kick,Poland,0.0,['c1cbeb10-8810-43db-be41-6fdc2edf2ae5'],3938643,771,789
+56dc5318-2e9a-424b-bd85-f5a076b9d620,3,1,00:00:00.000,0,0,Half Start,1,Romania,Regular Play,Romania,0.0,['b8c993f8-03d0-4527-8477-83f8987fa827'],3938638,905,905
+b8c993f8-03d0-4527-8477-83f8987fa827,4,1,00:00:00.000,0,0,Half Start,1,Romania,Regular Play,Ukraine,0.0,['56dc5318-2e9a-424b-bd85-f5a076b9d620'],3938638,905,911
+33fa9132-5637-4ca0-a6b9-80f1d65e444f,1740,2,00:00:00.000,45,0,Half Start,74,Romania,From Keeper,Ukraine,0.0,['9096165c-a316-4693-b921-ea401cff23eb'],3938638,905,911
+9096165c-a316-4693-b921-ea401cff23eb,1741,2,00:00:00.000,45,0,Half Start,74,Romania,From Keeper,Romania,0.0,['33fa9132-5637-4ca0-a6b9-80f1d65e444f'],3938638,905,905
+43dfe482-3d63-4b79-8e2a-a4a3a3986cbf,3,1,00:00:00.000,0,0,Half Start,1,Slovakia,Regular Play,Slovakia,0.0,['662f1daf-90ef-47e9-a4c4-daaebd874d98'],3930183,908,908
+662f1daf-90ef-47e9-a4c4-daaebd874d98,4,1,00:00:00.000,0,0,Half Start,1,Slovakia,Regular Play,Romania,0.0,['43dfe482-3d63-4b79-8e2a-a4a3a3986cbf'],3930183,908,905
+ecf926ad-c85f-4ed7-8930-fdbe26c6815d,1553,2,00:00:00.000,45,0,Half Start,83,Slovakia,Regular Play,Slovakia,0.0,['4c9b1ad1-c350-4e28-92f4-a76761f94cb0'],3930183,908,908
+4c9b1ad1-c350-4e28-92f4-a76761f94cb0,1554,2,00:00:00.000,45,0,Half Start,83,Slovakia,Regular Play,Romania,0.0,['ecf926ad-c85f-4ed7-8930-fdbe26c6815d'],3930183,908,905
+a6c4f1a3-2bad-48eb-97f1-d59133157684,3,1,00:00:00.000,0,0,Half Start,1,England,Regular Play,England,0.0,['c8dfe1fb-fe97-4a43-9794-b7c75e2e8d8c'],3930181,768,768
+c8dfe1fb-fe97-4a43-9794-b7c75e2e8d8c,4,1,00:00:00.000,0,0,Half Start,1,England,Regular Play,Slovenia,0.0,['a6c4f1a3-2bad-48eb-97f1-d59133157684'],3930181,768,944
+a5949204-9f5f-4e1e-9c22-c3e2a5e660cc,1922,2,00:00:00.000,45,0,Half Start,68,England,Regular Play,England,0.0,['02353d95-ba17-441d-a6a6-bc731f54472c'],3930181,768,768
+02353d95-ba17-441d-a6a6-bc731f54472c,1923,2,00:00:00.000,45,0,Half Start,68,England,Regular Play,Slovenia,0.0,['a5949204-9f5f-4e1e-9c22-c3e2a5e660cc'],3930181,768,944
+17a5db14-2507-4b90-8e34-0883bc4a054b,3,1,00:00:00.000,0,0,Half Start,1,Croatia,Regular Play,Italy,0.0,['23505fd5-0150-47e6-b9ad-30a3ca65b3bc'],3930178,785,914
+23505fd5-0150-47e6-b9ad-30a3ca65b3bc,4,1,00:00:00.000,0,0,Half Start,1,Croatia,Regular Play,Croatia,0.0,['17a5db14-2507-4b90-8e34-0883bc4a054b'],3930178,785,785
+a458ac7c-21bd-4948-83e3-3dcb775d2894,2197,2,00:00:00.000,45,0,Half Start,67,Italy,From Goal Kick,Croatia,0.0,['fde840e6-b159-48a4-b424-f63a57a852b1'],3930178,914,785
+fde840e6-b159-48a4-b424-f63a57a852b1,2198,2,00:00:00.000,45,0,Half Start,67,Italy,From Goal Kick,Italy,0.0,['a458ac7c-21bd-4948-83e3-3dcb775d2894'],3930178,914,914
+9f7fdbbb-da7c-41f7-a8e4-adfa36b69e2b,3,1,00:00:00.000,0,0,Half Start,1,Switzerland,Regular Play,Switzerland,0.0,['197068b4-4ae9-4238-aa01-1358d1d7f3db'],3930176,773,773
+197068b4-4ae9-4238-aa01-1358d1d7f3db,4,1,00:00:00.000,0,0,Half Start,1,Switzerland,Regular Play,Germany,0.0,['9f7fdbbb-da7c-41f7-a8e4-adfa36b69e2b'],3930176,773,770
+bbde4fca-99af-4f14-b2a2-7c71425525f9,1982,2,00:00:00.000,45,0,Half Start,74,Switzerland,Regular Play,Germany,0.0,['e4b6d059-0325-4817-ae56-544b6a8108e8'],3930176,773,770
+e4b6d059-0325-4817-ae56-544b6a8108e8,1983,2,00:00:00.000,45,0,Half Start,74,Switzerland,Regular Play,Switzerland,0.0,['bbde4fca-99af-4f14-b2a2-7c71425525f9'],3930176,773,773
+b33feb03-9657-4ebf-8080-189d933af3f9,3,1,00:00:00.000,0,0,Half Start,1,Belgium,Regular Play,Belgium,0.0,['4ebcc8c6-0e8e-4a23-b9a9-45ea163037d7'],3930175,782,782
+4ebcc8c6-0e8e-4a23-b9a9-45ea163037d7,4,1,00:00:00.000,0,0,Half Start,1,Belgium,Regular Play,Romania,0.0,['b33feb03-9657-4ebf-8080-189d933af3f9'],3930175,782,905
+1202f5cd-1c21-4143-a901-ca16f5b094c1,1702,2,00:00:00.000,45,0,Half Start,84,Belgium,From Goal Kick,Belgium,0.0,['94ed2449-15f3-42c8-b765-4df3cdc00f98'],3930175,782,782
+94ed2449-15f3-42c8-b765-4df3cdc00f98,1703,2,00:00:00.000,45,0,Half Start,84,Belgium,From Goal Kick,Romania,0.0,['1202f5cd-1c21-4143-a901-ca16f5b094c1'],3930175,782,905
+640b723c-be03-42a1-ad17-469633563c4d,3,1,00:00:00.000,0,0,Half Start,1,Turkey,Regular Play,Portugal,0.0,['0fb33a16-d528-4310-8cfa-7d359167d353'],3930174,909,780
+0fb33a16-d528-4310-8cfa-7d359167d353,4,1,00:00:00.000,0,0,Half Start,1,Turkey,Regular Play,Turkey,0.0,['640b723c-be03-42a1-ad17-469633563c4d'],3930174,909,909
+43498329-a20b-406f-b423-8a02aba3f5b5,1743,2,00:00:00.000,45,0,Half Start,75,Portugal,Regular Play,Turkey,0.0,['934b94aa-f64b-4bd1-bec3-e7390e7040b1'],3930174,780,909
+934b94aa-f64b-4bd1-bec3-e7390e7040b1,1744,2,00:00:00.000,45,0,Half Start,75,Portugal,Regular Play,Portugal,0.0,['43498329-a20b-406f-b423-8a02aba3f5b5'],3930174,780,780
+4aacfbb4-be7a-43f1-9aca-aa6628dfa235,3,1,00:00:00.000,0,0,Half Start,1,Slovenia,Regular Play,Serbia,0.0,['53cb0fc8-7a7d-445f-9a48-ef28402b44c7'],3930170,944,786
+53cb0fc8-7a7d-445f-9a48-ef28402b44c7,4,1,00:00:00.000,0,0,Half Start,1,Slovenia,Regular Play,Slovenia,0.0,['4aacfbb4-be7a-43f1-9aca-aa6628dfa235'],3930170,944,944
+2c9377af-622c-4a71-b32b-8b8459061f76,1943,2,00:00:00.000,45,0,Half Start,81,Slovenia,From Goal Kick,Slovenia,0.0,['854463a4-bf1f-4531-92c3-2706d8f637aa'],3930170,944,944
+854463a4-bf1f-4531-92c3-2706d8f637aa,1944,2,00:00:00.000,45,0,Half Start,81,Slovenia,From Goal Kick,Serbia,0.0,['2c9377af-622c-4a71-b32b-8b8459061f76'],3930170,944,786
+5c1d92fa-ded8-484a-9115-89c3243f7bfb,3,1,00:00:00.000,0,0,Half Start,1,Scotland,Regular Play,Scotland,0.0,['852f5cb6-795d-4563-83ce-44313f83dfd4'],3930169,942,942
+852f5cb6-795d-4563-83ce-44313f83dfd4,4,1,00:00:00.000,0,0,Half Start,1,Scotland,Regular Play,Switzerland,0.0,['5c1d92fa-ded8-484a-9115-89c3243f7bfb'],3930169,942,773
+0cb6e5cf-b53c-41d9-a48d-08572797d6d3,1656,2,00:00:00.000,45,0,Half Start,90,Switzerland,From Throw In,Switzerland,0.0,['6ede4412-b935-4b98-8fc3-ea99a9afee08'],3930169,773,773
+6ede4412-b935-4b98-8fc3-ea99a9afee08,1657,2,00:00:00.000,45,0,Half Start,90,Switzerland,From Throw In,Scotland,0.0,['0cb6e5cf-b53c-41d9-a48d-08572797d6d3'],3930169,773,942
+6a9094b0-5155-4c93-966f-94359e3522bf,3,1,00:00:00.000,0,0,Half Start,1,Portugal,Regular Play,Portugal,0.0,['20339616-d7b6-4f01-a264-ea42836292e9'],3930166,780,780
+20339616-d7b6-4f01-a264-ea42836292e9,4,1,00:00:00.000,0,0,Half Start,1,Portugal,Regular Play,Czech Republic,0.0,['6a9094b0-5155-4c93-966f-94359e3522bf'],3930166,780,912
+5d585b33-2364-475c-a62b-d09d49b8b23d,1981,2,00:00:00.000,45,0,Half Start,72,Czech Republic,Regular Play,Portugal,0.0,['efc91b35-4f20-4b73-b6b5-e2ab29b4f6f9'],3930166,912,780
+efc91b35-4f20-4b73-b6b5-e2ab29b4f6f9,1982,2,00:00:00.000,45,0,Half Start,72,Czech Republic,Regular Play,Czech Republic,0.0,['5d585b33-2364-475c-a62b-d09d49b8b23d'],3930166,912,912
+4c181d9c-b1fd-4b4d-900e-1d32639cbc41,3,1,00:00:00.000,0,0,Half Start,1,Serbia,Regular Play,Serbia,0.0,['86cc1303-942c-4c0d-8714-ccc398b76385'],3930163,786,786
+86cc1303-942c-4c0d-8714-ccc398b76385,4,1,00:00:00.000,0,0,Half Start,1,Serbia,Regular Play,England,0.0,['4c181d9c-b1fd-4b4d-900e-1d32639cbc41'],3930163,786,768
+a9a22987-7280-4ee7-813d-1d8946835d44,2040,2,00:00:00.000,45,0,Half Start,62,Serbia,From Corner,Serbia,0.0,['1c4b7698-723d-4632-bee1-faed2048aa92'],3930163,786,786
+1c4b7698-723d-4632-bee1-faed2048aa92,2041,2,00:00:00.000,45,0,Half Start,62,Serbia,From Corner,England,0.0,['a9a22987-7280-4ee7-813d-1d8946835d44'],3930163,786,768
+c9abd287-b42a-4458-ab5e-6f8b6bcdb03e,3,1,00:00:00.000,0,0,Half Start,1,Slovenia,Regular Play,Denmark,0.0,['70848c06-7a93-46e4-8c3e-6768c2d2374a'],3930162,944,776
+70848c06-7a93-46e4-8c3e-6768c2d2374a,4,1,00:00:00.000,0,0,Half Start,1,Slovenia,Regular Play,Slovenia,0.0,['c9abd287-b42a-4458-ab5e-6f8b6bcdb03e'],3930162,944,944
+2bbcf1b7-d4d8-423b-a5a1-5a1c75a23da3,1933,2,00:00:00.000,45,0,Half Start,63,Denmark,From Free Kick,Denmark,0.0,['7c6f198a-48e8-492b-922d-78eb0a299fb2'],3930162,776,776
+7c6f198a-48e8-492b-922d-78eb0a299fb2,1934,2,00:00:00.000,45,0,Half Start,63,Denmark,From Free Kick,Slovenia,0.0,['2bbcf1b7-d4d8-423b-a5a1-5a1c75a23da3'],3930162,776,944
+16a1233d-9d31-40a6-a838-7c6b1990b9d2,3,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Croatia,0.0,['7b2a405c-a4b3-4209-8629-db1e2164096a'],3930160,772,785
+7b2a405c-a4b3-4209-8629-db1e2164096a,4,1,00:00:00.000,0,0,Half Start,1,Spain,Regular Play,Spain,0.0,['16a1233d-9d31-40a6-a838-7c6b1990b9d2'],3930160,772,772
+42a57852-8cf6-4c61-bc50-f4373c714613,1824,2,00:00:00.000,45,0,Half Start,80,Croatia,From Kick Off,Spain,0.0,['a93fde4d-b13d-48a2-a097-ed923ae16c52'],3930160,785,772
+a93fde4d-b13d-48a2-a097-ed923ae16c52,1825,2,00:00:00.000,45,0,Half Start,80,Croatia,From Kick Off,Croatia,0.0,['42a57852-8cf6-4c61-bc50-f4373c714613'],3930160,785,785
+197b44b9-aca6-4b16-ae23-fa4ad331e378,3,1,00:00:00.000,0,0,Half Start,1,Hungary,Regular Play,Switzerland,0.0,['ece898fb-7698-461f-bda1-81726fc1ff76'],3930159,916,773
+ece898fb-7698-461f-bda1-81726fc1ff76,4,1,00:00:00.000,0,0,Half Start,1,Hungary,Regular Play,Hungary,0.0,['197b44b9-aca6-4b16-ae23-fa4ad331e378'],3930159,916,916
+82a4dece-2386-4aa4-b3b8-5400306ee9df,1657,2,00:00:00.000,45,0,Half Start,75,Switzerland,From Goal Kick,Hungary,0.0,['4084934c-0638-44d7-bceb-3f7a77a27877'],3930159,773,916
+4084934c-0638-44d7-bceb-3f7a77a27877,1658,2,00:00:00.000,45,0,Half Start,75,Switzerland,From Goal Kick,Switzerland,0.0,['82a4dece-2386-4aa4-b3b8-5400306ee9df'],3930159,773,773
+d9de8fe7-3122-4067-a1c2-a742c7edb2b8,3,1,00:00:00.000,0,0,Half Start,1,Germany,Regular Play,Germany,0.0,['455f819f-3926-4ed4-a0e9-4e9e4d0bf95a'],3930158,770,770
+455f819f-3926-4ed4-a0e9-4e9e4d0bf95a,4,1,00:00:00.000,0,0,Half Start,1,Germany,Regular Play,Scotland,0.0,['d9de8fe7-3122-4067-a1c2-a742c7edb2b8'],3930158,770,942
+922b4395-37e9-4750-ae19-aa1ddbbd94fd,1727,2,00:00:00.000,45,0,Half Start,66,Scotland,From Free Kick,Germany,0.0,['dccb5fda-54f1-4041-84b3-f060f95b4c4b'],3930158,942,770
+dccb5fda-54f1-4041-84b3-f060f95b4c4b,1728,2,00:00:00.000,45,0,Half Start,66,Scotland,From Free Kick,Scotland,0.0,['922b4395-37e9-4750-ae19-aa1ddbbd94fd'],3930158,942,942
