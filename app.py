@@ -31,12 +31,12 @@ def plotly_penalty_map(
     title: str = '',
 ):
     # Geometry and scaling 
-    depth_scale = 0.2
-    width_scale = 3
+    depth_scale = 0.13
+    width_scale = 2.15
     GOAL_Y_MIN, GOAL_Y_MAX = 36.0, 44.0
     GOAL_CENTER_Y, GOAL_Z_MAX = 40.0, 2.67
     GOAL_WIDTH = GOAL_Y_MAX - GOAL_Y_MIN
-    SIX_LEFT, SIX_RIGHT = 30.0, 50.0
+    SIX_LEFT, SIX_RIGHT = 33.0, 47.0
     PEN_LEFT, PEN_RIGHT = 18.0, 62.0
     penalty_spot_distance = 11.0
     six_yard_depth = 5.5
@@ -133,7 +133,7 @@ def plotly_penalty_map(
         y=penalties['plot_z'],
         mode='markers',
         marker=dict(
-            size=14,
+            size=12,
             color=[GOAL_COLOR if g else MISS_COLOR for g in penalties['is_goal']],
             line=dict(width=1.5, color=TEXT),
             opacity=0.9,
@@ -143,9 +143,9 @@ def plotly_penalty_map(
         name='Penalties',
     ))
     # Legend box coordinates (left of goal, shifted left)
-    legend_box_width = 3
+    legend_box_width = 2.4
     legend_box_height = 1
-    legend_x0 = x_left + 0.5
+    legend_x0 = x_left + 0.1
     legend_x1 = legend_x0 + legend_box_width
     legend_y0 = GOAL_Z_MAX - 1
     legend_y1 = legend_y0 + legend_box_height
@@ -179,12 +179,17 @@ def plotly_penalty_map(
         text=f"<span style='color:{MISS_COLOR};font-weight:bold'>● No Goal</span>", showarrow=False,
         font=dict(family="DejaVu Sans Mono", size=16, color=TEXT), xanchor='left', yanchor='middle')
     # Move details info below legend, left aligned, no 'Details' label
-    details_y = legend_y0 - 0.3
-    line1 = f"Regular Play: {regular_count} | Shootout: {shootout_count}"
-    line2 = f"Right Foot: {right_foot} | Left Foot: {left_foot}"
-    annotations.append(dict(x=legend_x0, y=details_y, text=line1, showarrow=False, font=font, xanchor='left', yanchor='top'))
-    details_y -= 0.4
-    annotations.append(dict(x=legend_x0, y=details_y, text=line2, showarrow=False, font=font, xanchor='left', yanchor='top'))
+    details_y = legend_y0 #- 0.10
+    details_x = legend_x0 #+ 0.10
+    # Type of Play header
+    annotations.append(dict(x=details_x, y=details_y, text="<b>Type of Play:</b>", showarrow=False, font=font, xanchor='left', yanchor='top'))
+    details_y -= 0.36
+    annotations.append(dict(x=details_x, y=details_y, text=f"Shootout: {shootout_count}  Regular: {regular_count}", showarrow=False, font=font, xanchor='left', yanchor='top'))
+    details_y -= 0.36
+    # Foot header
+    annotations.append(dict(x=details_x, y=details_y, text="<b>Foot:</b>", showarrow=False, font=font, xanchor='left', yanchor='top'))
+    details_y -= 0.36
+    annotations.append(dict(x=details_x, y=details_y, text=f"Left: {left_foot}  Right: {right_foot}", showarrow=False, font=font, xanchor='left', yanchor='top'))
     fig.update_layout(annotations=annotations)
     # Layout: match notebook proportions
     # Title color based on theme
