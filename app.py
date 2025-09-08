@@ -127,7 +127,7 @@ def plotly_penalty_map(
     fig.add_shape(type="line", x0=GOAL_CENTER_Y - 0.14, y0=z_spot, x1=GOAL_CENTER_Y + 0.14, y1=z_spot,
                   line=dict(color=LINE, width=3))
     # Penalty points
-    hover_text = penalties.apply(lambda row: f"{row['player']}<br>{row['team']} vs {row['opponent_team']}<br>{'Shootout' if row['period']==5 else 'Regular Play'}", axis=1)
+    hover_text = penalties.apply(lambda row: f"{row['player']}<br>{row['team']} vs {row['opponent_team']}<br>{'Shootout' if row['period']==5 else 'Regular Play'}, {row['shot_body_part']}", axis=1)
     fig.add_trace(go.Scatter(
         x=penalties['plot_y'],
         y=penalties['plot_z'],
