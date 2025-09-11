@@ -100,3 +100,5 @@ spielverlangerung.com
 Heatmap
 
 https://footsci.medium.com/passing-networks-with-expected-threat-xt-layer-7d699f75387b
+
+Usage rate: https://www.youtube.com/watch?v=iydcB3OM6EE
