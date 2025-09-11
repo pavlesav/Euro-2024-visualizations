@@ -181,50 +181,90 @@ if view_option == "Shot Map":
 
 elif view_option == "Pass Network":
     if match_id and selected_team:
-        xgchain_data = calculate_xgchain(all_events, match_id, selected_team)
-        opponent_team = None
-        match_row = euro_matches[euro_matches['match_id'] == match_id]
-        if not match_row.empty:
-            row = match_row.iloc[0]
-            opponent_team = row['away_team'] if row['home_team'] == selected_team else row['home_team']
-        total_passes = passes_euro[(passes_euro['match_id'] == match_id) & (passes_euro['team'] == selected_team)].shape[0]
-        st.markdown(f"### {selected_team} vs {opponent_team} — Total Passes: {total_passes}")
-        fig = plot_pass_network_plotly(
-            passes_euro=passes_euro,
-            lineups=lineups,
-            euro_matches=euro_matches,
-            match_id=match_id, 
-            team_name=selected_team,    
-            min_passes=min_passes, 
-            theme=theme,
-            xgchain_data=xgchain_data,
-            node_color=GOAL_COLOR,
-            edge_color=MISS_COLOR
-        )
-        if fig:
-            # Ensure colormap indicator is displayed for xGChain next to the pitch
+        col1, col2, col3 = st.columns([1.5, 4, 0.5])
+
+        with col2:
+            xgchain_data = calculate_xgchain(all_events, match_id, selected_team)
+            opponent_team = None
+            match_row = euro_matches[euro_matches['match_id'] == match_id]
+            if not match_row.empty:
+                row = match_row.iloc[0]
+                opponent_team = row['away_team'] if row['home_team'] == selected_team else row['home_team']
+            total_passes = passes_euro[(passes_euro['match_id'] == match_id) & (passes_euro['team'] == selected_team)].shape[0]
+            st.markdown(f"### {selected_team} vs {opponent_team} — Total Passes: {total_passes}")
+            
+            fig, stats = plot_pass_network_plotly(
+                passes_euro=passes_euro,
+                lineups=lineups,
+                euro_matches=euro_matches,
+                match_id=match_id, 
+                team_name=selected_team,    
+                min_passes=min_passes, 
+                theme=theme,
+                xgchain_data=xgchain_data,
+                node_color=GOAL_COLOR,
+                edge_color=MISS_COLOR
+            )
+            if fig:
+                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+        
+        with col1:
+            st.markdown("### Key Player Stats")
+            if stats:
+                if 'max_centrality' in stats:
+                    player, rank = stats['max_centrality']
+                    st.metric(label="Highest Centrality", value=player, delta=f"Rank {rank}")
+                if 'max_betweenness' in stats:
+                    player, rank = stats['max_betweenness']
+                    st.metric(label="Best Playmaker", value=player, delta=f"Rank {rank}")
+                if 'most_progressive' in stats:
+                    player, value = stats['most_progressive']
+                    st.metric(label="Most Progressive Passes", value=player, delta=f"{int(value)} passes")
+                if 'best_under_pressure' in stats:
+                    player, rate, attempts = stats['best_under_pressure']
+                    st.metric(label="Best Under Pressure (>5 attempts)", value=player, delta=f"{rate:.1f}% ({attempts} att)")
+                if 'network_density' in stats:
+                    density = stats['network_density']
+                    st.metric(label="Network Density", value=f"{density:.1f}%", delta="Team Connectivity")
+                if 'most_passes' in stats:
+                    player, value = stats['most_passes']
+                    st.metric(label="Most Passes Given", value=player, delta=f"{int(value)} passes")
+                if 'most_received' in stats:
+                    player, value = stats['most_received']
+                    st.metric(label="Most Passes Received", value=player, delta=f"{int(value)} passes")
+                if 'most_accurate' in stats:
+                    player, value = stats['most_accurate']
+                    st.metric(label="Highest Pass Accuracy (>50 attempts)", value=player, delta=f"{value:.1f}%")
+            else:
+                st.info("Not enough data to calculate player stats.")
+
+        with col3:
             if xgchain_data:
-                # Correct colormap labels and include actual max and min values next to the words
-                # Use player nickname if available, otherwise fallback to player name
                 max_player = max(xgchain_data, key=xgchain_data.get)
                 min_player = min(xgchain_data, key=xgchain_data.get)
-                max_player_display = lineups.loc[lineups['player_name'] == max_player, 'player_nickname'].iloc[0] if not lineups.loc[lineups['player_name'] == max_player, 'player_nickname'].isnull().all() else max_player
-                min_player_display = lineups.loc[lineups['player_name'] == min_player, 'player_nickname'].iloc[0] if not lineups.loc[lineups['player_name'] == min_player, 'player_nickname'].isnull().all() else min_player
-                col1, col2 = st.columns([4, 0.5])
-                with col1:
-                    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-                with col2:
-                    st.markdown(
-                        f"<div style='display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: space-between; margin-top: -20px;'>"
-                        f"<p style='margin: 0; font-weight: bold;'>Max ({max(xgchain_data.values()):.2f})</p>"
-                        f"<p style='margin: 0; font-size: 12px;'>{max_player_display}</p>"
-                        "<div style='width: 10px; height: 550px; background: linear-gradient(to bottom, rgba(253,231,37,1), rgba(53,183,121,1), rgba(49,104,142,1), rgba(68,1,84,1));'></div>"
-                        f"<p style='margin: 0; font-weight: bold;'>Min ({min(xgchain_data.values()):.2f})</p>"
-                        f"<p style='margin: 0; font-size: 12px;'>{min_player_display}</p>"
-                        "</div>",
-                        unsafe_allow_html=True
-                    )
-            else:
-                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+                
+                # Safely get nicknames
+                max_player_nick_series = lineups.loc[(lineups['player_name'] == max_player) & (lineups['match_id'] == match_id), 'player_nickname']
+                max_player_display = max_player_nick_series.iloc[0] if not max_player_nick_series.isnull().all() else max_player
+                
+                min_player_nick_series = lineups.loc[(lineups['player_name'] == min_player) & (lineups['match_id'] == match_id), 'player_nickname']
+                min_player_display = min_player_nick_series.iloc[0] if not min_player_nick_series.isnull().all() else min_player
+
+                st.markdown(
+                    f"<div style='display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: space-between; margin-top: 60px;'>"
+                    f"<div style='text-align: center; margin-bottom: 10px;'>"
+                    f"<p style='margin: 0; font-weight: bold; font-size: 20px;'>xGChain</p>"
+                    f"<p style='margin: 0; font-weight: bold;'>Max ({max(xgchain_data.values()):.2f})</p>"
+                    f"<p style='margin: 0; font-size: 12px;'>{max_player_display}</p>"
+                    f"</div>"
+                    "<div style='width: 10px; height: 460px; background: linear-gradient(to bottom, rgba(253,231,37,1), rgba(53,183,121,1), rgba(49,104,142,1), rgba(68,1,84,1));'></div>"
+                    f"<div style='text-align: center; margin-top: 10px;'>"
+                    f"<p style='margin: 0; font-weight: bold;'>Min ({min(xgchain_data.values()):.2f})</p>"
+                    f"<p style='margin: 0; font-size: 12px;'>{min_player_display}</p>"
+                    f"</div>"
+                    "</div>",
+                    unsafe_allow_html=True
+                )
+
     else:
         st.info("Please select a match from the sidebar to view the pass network.")
