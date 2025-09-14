@@ -1,18 +1,27 @@
 import streamlit as st
 import pandas as pd
-from data_loader import load_data, calculate_xgchain
-from visualizations import plotly_penalty_map_center_only, plot_pass_network_plotly
+from data_loader import (
+    load_data, 
+    calculate_xgchain, 
+    prepare_shot_map_data, 
+    prepare_pass_network_data,
+    calculate_player_radar_stats,
+    normalize_radar_stats,
+    calculate_tournament_xgchain,
+    prepare_tournament_pass_network_data
+)
+from visualizations import plotly_penalty_map_center_only, plot_pass_network_plotly, plot_player_radar_chart
 
 # --- Data Loading ---
 st.set_page_config(layout="wide")
 
-shots_euro, euro_matches, passes_euro, lineups, euro_groups, all_events = load_data()
+shots_euro, euro_matches, passes_euro, lineups, euro_groups, all_events, fifty_fifties, fifty_fifty_stats = load_data()
 
 # --- Streamlit UI ---
 with st.sidebar:
     st.markdown("# Euro 2024 Analysis")
     
-    view_option = st.radio("Select View", ["Shot Map", "Pass Network"])
+    view_option = st.radio("Select View", ["Shot Map", "Pass Network", "Player Analysis"])
     
     theme = st.selectbox("Theme", ["green", "white", "black"])
 
@@ -37,45 +46,28 @@ with st.sidebar:
     elif view_option == "Pass Network":
         st.markdown("## Pass Network Filters")
         
-        # Hierarchical selection for matches
-        stage_order = ['Final', 'Semi-finals', 'Quarter-finals', 'Round of 16', 'Group Stage']
-        stages = euro_matches['competition_stage'].unique()
-        sorted_stages = [s for s in stage_order if s in stages]
+        # Get all teams
+        all_teams = sorted(euro_groups['team'].dropna().unique())
+        selected_team = st.selectbox("Select Team", all_teams)
         
-        selected_stage = st.selectbox("Select Stage", sorted_stages)
+        min_passes = st.slider("Minimum number of passes", 1, 50, 20)
 
-        matches_in_stage = euro_matches[euro_matches['competition_stage'] == selected_stage]
-
-        if selected_stage == 'Group Stage':
-            groups = sorted(euro_groups['group'].dropna().unique())
-            selected_group = st.selectbox("Select Group", groups)
-            
-            # Get teams in the selected group
-            teams_in_group = euro_groups[euro_groups['group'] == selected_group]['team'].tolist()
-            
-            # Filter matches where both teams are in the selected group
-            matches_to_display = matches_in_stage[
-                matches_in_stage['home_team'].isin(teams_in_group) & 
-                matches_in_stage['away_team'].isin(teams_in_group)
-            ]
-        else:
-            matches_to_display = matches_in_stage
-
-        match_display_names = matches_to_display.apply(lambda row: f"{row['home_team']} vs {row['away_team']}", axis=1)
-        match_map = {name: mid for name, mid in zip(match_display_names, matches_to_display['match_id'])}
-
-        selected_match_name = st.selectbox("Select Match", match_display_names)
+    elif view_option == "Player Analysis":
+        st.markdown("## Player Analysis Filters")
         
-        if selected_match_name:
-            match_id = match_map[selected_match_name]
-            
-            selected_match_info = euro_matches[euro_matches['match_id'] == match_id].iloc[0]
-            team_options = [selected_match_info['home_team'], selected_match_info['away_team']]
-            selected_team = st.radio("Select Team", team_options)
-
-            min_passes = st.slider("Minimum number of passes", 1, 30, 10)
+        # Get all teams
+        all_teams = sorted(euro_groups['team'].dropna().unique())
+        selected_team = st.selectbox("Select Team", all_teams)
+        
+        # Get all players for the selected team across all matches
+        team_players = all_events[
+            all_events['team'] == selected_team
+        ]['player'].dropna().unique()
+        
+        if len(team_players) > 0:
+            selected_player = st.selectbox("Select Player", sorted(team_players))
         else:
-            match_id, selected_team, min_passes = None, None, None
+            selected_player = None
 
 
 # --- Main Panel ---
@@ -180,28 +172,26 @@ if view_option == "Shot Map":
                 st.markdown(f"{label}: {count}")
 
 elif view_option == "Pass Network":
-    if match_id and selected_team:
+    if selected_team:
         col1, col2, col3 = st.columns([1.5, 4, 0.5])
 
         with col2:
-            xgchain_data = calculate_xgchain(all_events, match_id, selected_team)
-            opponent_team = None
-            match_row = euro_matches[euro_matches['match_id'] == match_id]
-            if not match_row.empty:
-                row = match_row.iloc[0]
-                opponent_team = row['away_team'] if row['home_team'] == selected_team else row['home_team']
-            total_passes = passes_euro[(passes_euro['match_id'] == match_id) & (passes_euro['team'] == selected_team)].shape[0]
-            st.markdown(f"### {selected_team} vs {opponent_team} — Total Passes: {total_passes}")
+            # Calculate tournament-wide xGChain for the team
+            tournament_xgchain_data = calculate_tournament_xgchain(all_events, selected_team)
+            
+            # Get total passes for the team across all matches
+            total_passes = passes_euro[passes_euro['team'] == selected_team].shape[0]
+            st.markdown(f"### {selected_team} — Tournament Performance — Total Passes: {total_passes}")
             
             fig, stats = plot_pass_network_plotly(
                 passes_euro=passes_euro,
                 lineups=lineups,
                 euro_matches=euro_matches,
-                match_id=match_id, 
+                match_id=None,  # None indicates tournament-wide
                 team_name=selected_team,    
                 min_passes=min_passes, 
                 theme=theme,
-                xgchain_data=xgchain_data,
+                xgchain_data=tournament_xgchain_data,
                 node_color=GOAL_COLOR,
                 edge_color=MISS_COLOR
             )
@@ -239,27 +229,24 @@ elif view_option == "Pass Network":
                 st.info("Not enough data to calculate player stats.")
 
         with col3:
-            if xgchain_data:
-                max_player = max(xgchain_data, key=xgchain_data.get)
-                min_player = min(xgchain_data, key=xgchain_data.get)
+            if tournament_xgchain_data:
+                max_player = max(tournament_xgchain_data, key=tournament_xgchain_data.get)
+                min_player = min(tournament_xgchain_data, key=tournament_xgchain_data.get)
                 
-                # Safely get nicknames
-                max_player_nick_series = lineups.loc[(lineups['player_name'] == max_player) & (lineups['match_id'] == match_id), 'player_nickname']
-                max_player_display = max_player_nick_series.iloc[0] if not max_player_nick_series.isnull().all() else max_player
-                
-                min_player_nick_series = lineups.loc[(lineups['player_name'] == min_player) & (lineups['match_id'] == match_id), 'player_nickname']
-                min_player_display = min_player_nick_series.iloc[0] if not min_player_nick_series.isnull().all() else min_player
+                # Get player display names
+                max_player_display = max_player.split()[-1] if max_player else max_player
+                min_player_display = min_player.split()[-1] if min_player else min_player
 
                 st.markdown(
                     f"<div style='display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: space-between; margin-top: 60px;'>"
                     f"<div style='text-align: center; margin-bottom: 10px;'>"
-                    f"<p style='margin: 0; font-weight: bold; font-size: 20px;'>xGChain</p>"
-                    f"<p style='margin: 0; font-weight: bold;'>Max ({max(xgchain_data.values()):.2f})</p>"
+                    f"<p style='margin: 0; font-weight: bold; font-size: 20px;'>Tournament xGChain</p>"
+                    f"<p style='margin: 0; font-weight: bold;'>Max ({max(tournament_xgchain_data.values()):.2f})</p>"
                     f"<p style='margin: 0; font-size: 12px;'>{max_player_display}</p>"
                     f"</div>"
                     "<div style='width: 10px; height: 460px; background: linear-gradient(to bottom, rgba(253,231,37,1), rgba(53,183,121,1), rgba(49,104,142,1), rgba(68,1,84,1));'></div>"
                     f"<div style='text-align: center; margin-top: 10px;'>"
-                    f"<p style='margin: 0; font-weight: bold;'>Min ({min(xgchain_data.values()):.2f})</p>"
+                    f"<p style='margin: 0; font-weight: bold;'>Min ({min(tournament_xgchain_data.values()):.2f})</p>"
                     f"<p style='margin: 0; font-size: 12px;'>{min_player_display}</p>"
                     f"</div>"
                     "</div>",
@@ -267,4 +254,68 @@ elif view_option == "Pass Network":
                 )
 
     else:
-        st.info("Please select a match from the sidebar to view the pass network.")
+        st.info("Please select a team from the sidebar to view the pass network.")
+
+elif view_option == "Player Analysis":
+    if selected_team and selected_player:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        
+        with col2:
+            # Calculate tournament-wide player radar stats
+            player_stats = calculate_player_radar_stats(
+                all_events, passes_euro, shots_euro, 
+                None, selected_team, selected_player  # None for tournament-wide
+            )
+            
+            if player_stats:
+                # Get all players from the team for normalization
+                all_team_players = all_events[all_events['team'] == selected_team]['player'].dropna().unique()
+                
+                # Calculate stats for all players in the team for proper normalization
+                all_player_stats = {}
+                for player in all_team_players:
+                    stats = calculate_player_radar_stats(
+                        all_events, passes_euro, shots_euro, 
+                        None, selected_team, player  # None for tournament-wide
+                    )
+                    if stats:
+                        all_player_stats[player] = stats
+                
+                # Normalize stats
+                normalized_stats = normalize_radar_stats(all_player_stats)
+                selected_player_normalized = normalized_stats.get(selected_player, {})
+                
+                # Create radar chart
+                fig = plot_player_radar_chart(selected_player_normalized, selected_player, theme)
+                
+                if fig:
+                    st.markdown(f"### {selected_player} - {selected_team} Tournament Performance")
+                    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+                else:
+                    st.error("Could not generate radar chart for this player.")
+            else:
+                st.error("No data available for this player in the tournament.")
+        
+        with col1:
+            if player_stats:
+                st.markdown("### Tournament Statistics")
+                st.metric("Total Minutes", f"{player_stats.get('minutes_played', 0):.0f}")
+                st.metric("Total Passes", f"{player_stats.get('total_passes', 0)}")
+                st.metric("Pass Accuracy", f"{player_stats.get('pass_accuracy', 0):.1f}%")
+                st.metric("Progressive Passes", f"{player_stats.get('progressive_passes', 0)}")
+                st.metric("Key Passes", f"{player_stats.get('key_passes', 0)}")
+                st.metric("Total Shots", f"{player_stats.get('shots', 0)}")
+                st.metric("Total Goals", f"{player_stats.get('goals', 0)}")
+                st.metric("Total Assists", f"{player_stats.get('assists', 0)}")
+        
+        with col3:
+            if player_stats:
+                st.markdown("### Defensive Actions")
+                st.metric("Tackles", f"{player_stats.get('tackles', 0)}")
+                st.metric("Interceptions", f"{player_stats.get('interceptions', 0)}")
+                st.metric("Recoveries", f"{player_stats.get('recoveries', 0)}")
+                st.metric("Blocks", f"{player_stats.get('blocks', 0)}")
+                st.metric("Clearances", f"{player_stats.get('clearances', 0)}")
+                st.metric("50/50s Won", f"{player_stats.get('50_50s_won', 0)}")  # Replace "Duel success rate"
+    else:
+        st.info("Please select a team and player from the sidebar to view the player analysis.")

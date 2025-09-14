@@ -5,7 +5,93 @@ import plotly.graph_objects as go
 import networkx as nx
 import plotly.colors as pcolors
 import matplotlib.pyplot as plt
-# from visualizations.pitch import draw_full_pitch_plotly
+from data_loader import prepare_shot_map_data, prepare_pass_network_data, calculate_minutes_played
+
+def plot_player_radar_chart(player_stats, player_name, theme="green"):
+    """
+    Create a radar chart for player statistics using Plotly
+    """
+    if not player_stats:
+        return None
+    
+    # Define radar categories and their corresponding normalized stats
+    categories = [
+        ('Defensive Actions', 'defensive_actions'),
+        ('Passing', 'passing'),
+        ('G+A', 'g_a'),
+        ('Dribbling', 'dribbling'),
+        ('Key Passes', 'key_passes')
+    ]
+    
+    # Extract values for radar chart
+    category_names = [cat[0] for cat in categories]
+    values = [player_stats.get(cat[1], 0) for cat in categories]
+    
+    # Close the radar chart by adding first value at the end
+    values += values[:1]
+    category_names += category_names[:1]
+    
+    # Theme colors
+    if theme == "white":
+        bg_color = "#f7f7f7"
+        line_color = "#333333"
+        fill_color = "rgba(31, 119, 180, 0.3)"
+        text_color = "#111111"
+    elif theme == "black":
+        bg_color = "#000000"
+        line_color = "#e6e6e6"
+        fill_color = "rgba(46, 204, 113, 0.3)"
+        text_color = "#e6e6e6"
+    else:  # green
+        bg_color = "#2d5e2e"
+        line_color = "white"
+        fill_color = "rgba(255, 255, 255, 0.3)"
+        text_color = "white"
+    
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatterpolar(
+        r=values,
+        theta=category_names,
+        fill='toself',
+        fillcolor=fill_color,
+        line=dict(color=line_color, width=2),
+        name=player_name,
+        hovertemplate='<b>%{theta}</b><br>Score: %{r:.1f}/100<extra></extra>'
+    ))
+    
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                gridcolor=line_color,
+                gridwidth=1,
+                tickcolor=text_color,
+                tickfont=dict(color=text_color, size=10)
+            ),
+            angularaxis=dict(
+                gridcolor=line_color,
+                gridwidth=1,
+                tickcolor=text_color,
+                tickfont=dict(color=text_color, size=12)
+            ),
+            bgcolor=bg_color
+        ),
+        showlegend=False,
+        title=dict(
+            text=f"{player_name} - Performance Radar",
+            x=0.5,
+            font=dict(size=18, color=text_color)
+        ),
+        plot_bgcolor=bg_color,
+        paper_bgcolor=bg_color,
+        height=600,
+        width=600,
+        margin=dict(l=80, r=80, t=80, b=80)
+    )
+    
+    return fig
 
 def plotly_penalty_map_center_only(
     shots_df: pd.DataFrame,
@@ -19,6 +105,11 @@ def plotly_penalty_map_center_only(
     GOAL_COLOR: str = "#1f77b4",
     MISS_COLOR: str = "#ff7f0e"
 ):
+    # Prepare shot data
+    shot_data = prepare_shot_map_data(shots_df, jitter)
+    
+    shots = shot_data['shots']
+    
     # Geometry and scaling
     depth_scale = 0.13
     width_scale = 2.4
@@ -30,51 +121,26 @@ def plotly_penalty_map_center_only(
     penalty_spot_distance = 11.0
     six_yard_depth = 5.5
     penalty_area_depth = 16.5
+    
     def z_m(d_m):
         return -d_m * depth_scale
 
     z_six = z_m(six_yard_depth)
     z_pen = z_m(penalty_area_depth)
     z_spot = z_m(penalty_spot_distance)
+    
     # Horizontal view scaled to goal width
     span = GOAL_WIDTH * width_scale / 2
     x_left = GOAL_CENTER_Y - span
     x_right = GOAL_CENTER_Y + span
+    
     # Vertical axis compressed
     y_bottom = z_pen - 0.5
     y_top = GOAL_Z_MAX + 1.2
 
-    shots = shots_df.copy()
-    if shots.empty:
-        st.warning("No shots of this type were made for selected filter.")
-        return None
-    def extract_xyz(val):
-        if isinstance(val, (list, tuple)) and len(val) == 3:
-            return val
-        if isinstance(val, str):
-            try:
-                arr = eval(val)
-                if isinstance(arr, (list, tuple)) and len(arr) == 3:
-                    return arr
-            except Exception:
-                pass
-        return [np.nan, np.nan, np.nan]
-
-    xyz = shots['shot_end_location'].apply(extract_xyz).tolist()
-    shots[['end_x', 'end_y', 'end_z']] = pd.DataFrame(xyz, index=shots.index)
-    shots['is_goal'] = shots[outcome_col].astype(str).eq('Goal')
-    shots['plot_y'] = shots['end_y'] + np.random.uniform(-jitter, jitter, len(shots))
-    shots['plot_z'] = shots['end_z'] + np.random.uniform(-jitter, jitter, len(shots))
-    total = len(shots)
-    goals = int(shots['is_goal'].sum())
-    not_goals = total - goals
-    goal_rate = 100 * goals / total if total else 0
-    miss_types = shots.loc[~shots['is_goal'], outcome_col].value_counts().sort_values(ascending=False)
-    body_part_counts = shots['shot_body_part'].value_counts()
-    shootout_count = int((shots['period'] == 5).sum())
-    regular_count = total - shootout_count
     # Plotly figure
     fig = go.Figure()
+    
     # Theme colors
     t = theme.lower()
     if t == "white":
@@ -83,6 +149,7 @@ def plotly_penalty_map_center_only(
         PITCH_BG, LINE, NET, TEXT = "#000000", "#e6e6e6", "#e6e6e6", "#e6e6e6"
     else:
         PITCH_BG, LINE, NET, TEXT = "#2d5e2e", "white", "white", "black"
+    
     # Goal frame (left, right, top) with opacity 0.8
     fig.add_shape(type="line", x0=GOAL_Y_MIN, y0=0, x1=GOAL_Y_MIN, y1=GOAL_Z_MAX, line=dict(color=LINE, width=3), opacity=0.9)
     fig.add_shape(type="line", x0=GOAL_Y_MAX, y0=0, x1=GOAL_Y_MAX, y1=GOAL_Z_MAX, line=dict(color=LINE, width=3), opacity=0.9)
@@ -107,8 +174,9 @@ def plotly_penalty_map_center_only(
     # Penalty spot
     fig.add_shape(type="line", x0=GOAL_CENTER_Y - 0.14, y0=z_spot, x1=GOAL_CENTER_Y + 0.14, y1=z_spot,
                   line=dict(color=LINE, width=3), opacity=0.4)
+
     # Scatter plot
-    is_penalty = shots['shot_type'].eq('Penalty').all()
+    is_penalty = shot_data['is_penalty']
     if is_penalty:
         hover_text = shots.apply(lambda row: f"{row['player']}<br>{row['team']} vs {row['opponent_team']}<br>{'Shootout' if row['period']==5 else 'Regular Play'}<br>{row['shot_body_part']}<br>xG: {row.get('shot_statsbomb_xg', 0):.2f}", axis=1)
     else:
@@ -137,7 +205,7 @@ def plotly_penalty_map_center_only(
         marker=dict(
             size=sizes,
             color=[GOAL_COLOR if g else MISS_COLOR for g in shots['is_goal']],
-            line=dict(width=1, color=TEXT),  # Circle outline for each dot
+            line=dict(width=1, color=TEXT),
             opacity=[0.95 if g else 0.25 for g in shots['is_goal']],
         ),
         text=hover_text,
@@ -206,7 +274,10 @@ def plotly_penalty_map_center_only(
         width=fig_width,
         margin=dict(l=0, r=0, t=0, b=0),
     )
-    return fig, total, goals, not_goals, goal_rate, miss_types, body_part_counts, is_penalty, shootout_count, regular_count
+    
+    return (fig, shot_data['total'], shot_data['goals'], shot_data['not_goals'], 
+            shot_data['goal_rate'], shot_data['miss_types'], shot_data['body_part_counts'], 
+            shot_data['is_penalty'], shot_data['shootout_count'], shot_data['regular_count'])
 
 def draw_full_pitch_plotly(
     *,
@@ -262,7 +333,6 @@ def draw_full_pitch_plotly(
         width=fig_width,
         margin=dict(l=0, r=0, t=0, b=0),
     )
-    # Remove title from graph
     return fig
 
 def plot_pass_network_plotly(
@@ -279,7 +349,32 @@ def plot_pass_network_plotly(
 ):
     """
     Generates and plots an interactive pass network using Plotly.
+    If match_id is None, creates tournament-wide network for the team.
     """
+    # Prepare network data based on whether it's match-specific or tournament-wide
+    if match_id is not None:
+        # Match-specific network (existing functionality)
+        network_data = prepare_pass_network_data(passes_euro, lineups, match_id, team_name, xgchain_data)
+    else:
+        # Tournament-wide network
+        from data_loader import prepare_tournament_pass_network_data
+        network_data = prepare_tournament_pass_network_data(passes_euro, lineups, team_name, xgchain_data)
+    
+    if network_data is None:
+        return None, None
+
+    # Extract data from prepared network data
+    team_passes = network_data['team_passes']
+    starting_11 = network_data['starting_11']
+    player_positions = network_data['player_positions']
+    pass_counts = network_data['pass_counts']
+    team_numbers = network_data['team_numbers']
+    team_nicknames = network_data['team_nicknames']
+    progressive_passes = network_data['progressive_passes']
+    pass_success_under_pressure = network_data['pass_success_under_pressure']
+    quality_scores = network_data['quality_scores']
+    pass_accuracy = network_data['pass_accuracy']
+
     # Set hover background color and font color for theme
     if theme == "green":
         hover_bg = "black"
@@ -302,47 +397,7 @@ def plot_pass_network_plotly(
         end_offset = np.array([x2, y2]) - norm_vec * offset_along + perp_vec
         return start_offset[0], start_offset[1], end_offset[0], end_offset[1]
 
-    team_passes = passes_euro[(passes_euro['match_id'] == match_id) & (passes_euro['team'] == team_name)]
-    if team_passes.empty:
-        return None
-
-    starting_11 = team_passes.sort_values('minute').drop_duplicates('player').head(11)['player'].tolist()
-
-    player_positions = {}
-    for player in starting_11:
-        player_passes = team_passes[team_passes['player'] == player]
-        locs = player_passes['location'].apply(lambda val: eval(val) if isinstance(val, str) else val)
-        xs = [loc[0] for loc in locs if loc and len(loc) > 1]
-        ys = [loc[1] for loc in locs if loc and len(loc) > 1]
-        if xs and ys:
-            # Flip y-axis for correct orientation
-            player_positions[player] = (sum(xs)/len(xs), 80 - (sum(ys)/len(ys)))
-        else:
-            player_positions[player] = (0, 0)
-
-    pass_counts = {}
-    for _, row in team_passes.iterrows():
-        passer = row['player']
-        recipient = row['pass_recipient']
-        if pd.notnull(passer) and pd.notnull(recipient) and passer in starting_11 and recipient in starting_11:
-            key = (passer, recipient)
-            pass_counts[key] = pass_counts.get(key, 0) + 1
-
-    if lineups.empty:
-        team_numbers = {p: p for p in starting_11}
-        team_nicknames = {p: p.split()[-1] if p else "" for p in starting_11}
-    else:
-        team_lineup = lineups[(lineups['match_id'] == match_id) & (lineups['team_name'] == team_name)]
-        if team_lineup.empty:
-            team_numbers = {p: p for p in starting_11}
-            team_nicknames = {p: p.split()[-1] if p else "" for p in starting_11}
-        else:
-            team_numbers = {p['player_name']: str(p['jersey_number']) for _, p in team_lineup.iterrows()}
-            team_nicknames = {
-                p['player_name']: p['player_nickname'] if pd.notnull(p['player_nickname']) else p['player_name']
-                for _, p in team_lineup.iterrows()
-            }
-
+    # Convert to number-based mappings for graph processing
     player_positions_num = {team_numbers.get(p, p): pos for p, pos in player_positions.items()}
     pass_counts_num = {(team_numbers.get(p1, p1), team_numbers.get(p2, p2)): count for (p1, p2), count in pass_counts.items()}
     
@@ -367,63 +422,6 @@ def plot_pass_network_plotly(
     
     # Calculate network density
     network_density = nx.density(G_full)
-    
-    # Calculate progressive passes and pass success under pressure
-    progressive_passes = {}
-    pass_success_under_pressure = {}
-    
-    for player in starting_11:
-        player_passes = team_passes[team_passes['player'] == player]
-        
-        # Progressive passes - passes that move the ball forward significantly
-        progressive_count = 0
-        for _, pass_row in player_passes.iterrows():
-            if 'pass_end_location' in pass_row and 'location' in pass_row:
-                try:
-                    start_loc = eval(pass_row['location']) if isinstance(pass_row['location'], str) else pass_row['location']
-                    end_loc = eval(pass_row['pass_end_location']) if isinstance(pass_row['pass_end_location'], str) else pass_row['pass_end_location']
-                    
-                    if start_loc and end_loc and len(start_loc) >= 2 and len(end_loc) >= 2:
-                        # Progressive if moves ball forward by at least 10 meters towards goal
-                        forward_progress = end_loc[0] - start_loc[0]
-                        if forward_progress >= 10:
-                            progressive_count += 1
-                except:
-                    continue
-        
-        progressive_passes[player] = progressive_count
-        
-        # Pass success under pressure - using pass outcome when under pressure
-        # Check multiple possible column names for pressure indication
-        pressure_conditions = []
-        if 'under_pressure' in player_passes.columns:
-            pressure_conditions.append(player_passes['under_pressure'] == True)
-        if 'pass_under_pressure' in player_passes.columns:
-            pressure_conditions.append(player_passes['pass_under_pressure'] == True)
-        
-        if pressure_conditions:
-            # Combine all pressure conditions with OR
-            combined_pressure = pressure_conditions[0]
-            for condition in pressure_conditions[1:]:
-                combined_pressure = combined_pressure | condition
-            
-            under_pressure_passes = player_passes[combined_pressure]
-        else:
-            # If no pressure columns found, use a small sample to avoid division by zero
-            under_pressure_passes = pd.DataFrame()
-        
-        if len(under_pressure_passes) > 0:
-            # Check for successful passes - try multiple possible outcome values
-            successful_passes = under_pressure_passes[
-                (under_pressure_passes['pass_outcome'].isin(['Complete', 'Successful', 'complete', 'successful'])) |
-                (under_pressure_passes['pass_outcome'].isna() & under_pressure_passes['pass_recipient'].notna())
-            ]
-            successful_count = len(successful_passes)
-            total_pressure_passes = len(under_pressure_passes)
-            success_rate = (successful_count / total_pressure_passes) * 100
-            pass_success_under_pressure[player] = (success_rate, total_pressure_passes)
-        else:
-            pass_success_under_pressure[player] = (0, 0)
 
     fig = draw_full_pitch_plotly(theme=theme, fig_width=800, fig_height=600)
     
@@ -433,35 +431,8 @@ def plot_pass_network_plotly(
     node_x = [p[0] for p in node_positions]
     node_y = [p[1] for p in node_positions]
 
-    # Node sizes based on quality score (pass accuracy + progressive pass rate + xGChain)
+    # Node sizes based on quality score
     player_names_by_jersey = {str(v): k for k, v in team_numbers.items()}
-    quality_scores = {}
-    for j in node_jersey_numbers:
-        full_player_name = player_names_by_jersey.get(j, '')
-        
-        # Get pass accuracy
-        player_all_passes = team_passes[team_passes['player'] == full_player_name]
-        if len(player_all_passes) > 0:
-            passes_with_recipients = player_all_passes[player_all_passes['pass_recipient'].notna()]
-            pass_accuracy = (len(passes_with_recipients) / len(player_all_passes)) * 100
-        else:
-            pass_accuracy = 0
-        
-        # Get progressive pass rate
-        total_passes_player = len(player_all_passes)
-        prog_passes = progressive_passes.get(full_player_name, 0)
-        progressive_rate = (prog_passes / total_passes_player * 100) if total_passes_player > 0 else 0
-        
-        # Get xGChain value
-        xgchain_value = xgchain_data.get(full_player_name, 0) if xgchain_data else 0
-        
-        # Normalize xGChain to 0-100 scale for composite score
-        max_xgchain = max(xgchain_data.values()) if xgchain_data else 1
-        normalized_xgchain = (xgchain_value / max_xgchain * 100) if max_xgchain > 0 else 0
-        
-        # Composite quality score (weighted average)
-        quality_score = (pass_accuracy * 0.3) + (progressive_rate * 0.4) + (normalized_xgchain * 0.3)
-        quality_scores[j] = quality_score
     
     # Scale quality scores to node sizes
     min_quality = min(quality_scores.values()) if quality_scores else 0
@@ -470,8 +441,9 @@ def plot_pass_network_plotly(
     min_node_size, max_node_size = 15, 35
     node_sizes = []
     for j in node_jersey_numbers:
+        player_name = player_names_by_jersey.get(j, '')
         if max_quality > min_quality:
-            normalized_quality = (quality_scores[j] - min_quality) / (max_quality - min_quality)
+            normalized_quality = (quality_scores.get(player_name, 0) - min_quality) / (max_quality - min_quality)
             size = min_node_size + (max_node_size - min_node_size) * normalized_quality
         else:
             size = min_node_size
@@ -585,7 +557,6 @@ def plot_pass_network_plotly(
             betweenness_ranks[player] = rank
 
     hover_text = []
-    player_names_by_jersey = {str(v): k for k, v in team_numbers.items()}
     for j in node_jersey_numbers:
         player_name = jersey_to_display_name.get(j, 'Unknown')
         full_player_name = player_names_by_jersey.get(j, '')
@@ -597,45 +568,12 @@ def plot_pass_network_plotly(
         pressure_success, pressure_attempts = pass_success_under_pressure.get(full_player_name, (0, 0))
         
         # Calculate minutes played
-        player_events = team_passes[team_passes['player'] == full_player_name]
-        if len(player_events) > 0:
-            min_minute = player_events['minute'].min()
-            max_minute = player_events['minute'].max()
-            minutes_played = max_minute - min_minute + 1  # +1 to include both start and end minutes
-            # Cap at 90 minutes for regular time (could be extended for extra time)
-            minutes_played = min(minutes_played, 90)
-        else:
-            minutes_played = 0
+        minutes_played = calculate_minutes_played(team_passes, full_player_name)
         
-        # Calculate individual pass accuracy
-        player_all_passes = team_passes[team_passes['player'] == full_player_name]
-        if len(player_all_passes) > 0:
-            # First, let's be more inclusive about what counts as a successful pass
-            # A pass is successful if it has a recipient (regardless of explicit outcome)
-            # or if it's explicitly marked as complete/successful
-            
-            # Count passes with recipients (most reliable indicator of success)
-            passes_with_recipients = player_all_passes[player_all_passes['pass_recipient'].notna()]
-            
-            # Also include passes explicitly marked as successful
-            explicit_success = player_all_passes[
-                player_all_passes['pass_outcome'].str.lower().isin(['complete', 'successful']) == True
-            ] if 'pass_outcome' in player_all_passes.columns else pd.DataFrame()
-            
-            # Combine both approaches - use passes with recipients as primary measure
-            if len(passes_with_recipients) > 0:
-                successful_count = len(passes_with_recipients)
-            elif len(explicit_success) > 0:
-                successful_count = len(explicit_success)
-            else:
-                # Fallback: assume most passes are successful if no clear indicators
-                successful_count = len(player_all_passes) * 0.8  # Rough estimate
-                
-            pass_accuracy = (successful_count / len(player_all_passes)) * 100
-        else:
-            pass_accuracy = 0
+        # Get individual pass accuracy
+        player_accuracy = pass_accuracy.get(full_player_name, 0)
         
-        text = f"#{j} {player_name}<br>Minutes Played: {minutes_played}<br>Passes Given: {total_passes}<br>Passes Received: {received_passes}<br>Pass Accuracy: {pass_accuracy:.1f}%<br>Centrality Rank: {centrality_rank}<br>Betweenness Rank: {betweenness_rank}<br>Progressive Passes: {prog_passes}"
+        text = f"#{j} {player_name}<br>Minutes Played: {minutes_played}<br>Passes Given: {total_passes}<br>Passes Received: {received_passes}<br>Pass Accuracy: {player_accuracy:.1f}%<br>Centrality Rank: {centrality_rank}<br>Betweenness Rank: {betweenness_rank}<br>Progressive Passes: {prog_passes}"
         
         if pressure_attempts > 0:
             text += f"<br>Under Pressure: {pressure_success:.1f}% ({pressure_attempts} att)"
@@ -669,22 +607,22 @@ def plot_pass_network_plotly(
     fig.update_layout(showlegend=False)
     
     # Add styled legend box for visual encoding
-    legend_x = 3  # Moved closer to left edge
-    legend_y = 77  # Moved closer to top edge
+    legend_x = 3
+    legend_y = 77
     legend_width = 34
-    legend_height = 12  # Adjusted height for better centering
+    legend_height = 12
     
     # Determine colors based on theme - use contrasting colors that pop
     if theme == "white":
-        bg_color = "rgba(50, 50, 50, 0.9)"  # Dark background for contrast
+        bg_color = "rgba(50, 50, 50, 0.9)"
         border_color = "#333333"
         text_color = "white"
     elif theme == "black":
-        bg_color = "rgba(240, 240, 240, 0.95)"  # Light background for contrast
+        bg_color = "rgba(240, 240, 240, 0.95)"
         border_color = "#cccccc"
         text_color = "black"
     else:  # green
-        bg_color = "rgba(255, 255, 255, 0.92)"  # White background for contrast
+        bg_color = "rgba(255, 255, 255, 0.92)"
         border_color = "#2d5e2e"
         text_color = "#2d5e2e"
     
@@ -742,8 +680,8 @@ def plot_pass_network_plotly(
         min_centrality_node = min(centrality_full, key=centrality_full.get)
         max_player_name = jersey_to_display_name.get(str(max_centrality_node), str(max_centrality_node))
         min_player_name = jersey_to_display_name.get(str(min_centrality_node), str(min_centrality_node))
-        stats['max_centrality'] = (max_player_name, 1)  # Rank 1 for highest centrality
-        stats['min_centrality'] = (min_player_name, len(centrality_full))  # Last rank for lowest centrality
+        stats['max_centrality'] = (max_player_name, 1)
+        stats['min_centrality'] = (min_player_name, len(centrality_full))
 
     # Betweenness Centrality (playmaker identification)
     if betweenness_centrality_full:
@@ -753,7 +691,6 @@ def plot_pass_network_plotly(
 
     # Progressive Passes
     if progressive_passes:
-        # Sort by progressive passes count first, then by total passes as tiebreaker
         most_progressive_player = max(progressive_passes.keys(), 
                                     key=lambda x: (progressive_passes[x], player_pass_counts.get(x, 0)))
         if most_progressive_player in team_nicknames:
@@ -763,9 +700,8 @@ def plot_pass_network_plotly(
         stats['most_progressive'] = (most_progressive_display, progressive_passes[most_progressive_player])
 
     # Pass success under pressure
-    pressure_players = {p: data for p, data in pass_success_under_pressure.items() if data[1] >= 5}  # At least 5 attempts
+    pressure_players = {p: data for p, data in pass_success_under_pressure.items() if data[1] >= 5}
     if pressure_players:
-        # Sort by success rate first, then by number of attempts as tiebreaker
         best_under_pressure_player = max(pressure_players.keys(), 
                                        key=lambda x: (pressure_players[x][0], pressure_players[x][1]))
         if best_under_pressure_player in team_nicknames:
@@ -776,7 +712,7 @@ def plot_pass_network_plotly(
         stats['best_under_pressure'] = (best_pressure_display, pressure_rate, pressure_attempts)
 
     # Network density
-    stats['network_density'] = network_density * 100  # Convert to percentage
+    stats['network_density'] = network_density * 100
 
     # Most passes given
     if player_pass_counts:
@@ -797,24 +733,21 @@ def plot_pass_network_plotly(
             most_received_player_display_name = most_received_player_name
         stats['most_received'] = (most_received_player_display_name, recipient_counts.iloc[0])
 
-    # Pass accuracy
+    # Pass accuracy - using corrected calculation
     passer_counts = team_passes['player'].value_counts()
-    complete_passes = team_passes[
-        (team_passes['pass_outcome'].isin(['Complete', 'Successful', 'complete', 'successful'])) |
-        (team_passes['pass_outcome'].isna() & team_passes['pass_recipient'].notna())
-    ]['player'].value_counts()
+    passer_counts = passer_counts[passer_counts >= 50]  # At least 50 passes
     
-    # Consider only players with at least 5 passes
-    passer_counts = passer_counts[passer_counts >= 50]
     if not passer_counts.empty:
-        accuracy = (complete_passes / passer_counts).dropna()
-        if not accuracy.empty:
-            most_accurate_player_name = accuracy.idxmax()
+        accuracy_dict = {}
+        for player in passer_counts.index:
+            accuracy_dict[player] = pass_accuracy.get(player, 0)
+        
+        if accuracy_dict:
+            most_accurate_player_name = max(accuracy_dict, key=accuracy_dict.get)
             if most_accurate_player_name in team_nicknames:
                 most_accurate_player_display_name = team_nicknames[most_accurate_player_name]
             else:
                 most_accurate_player_display_name = most_accurate_player_name
-
-            stats['most_accurate'] = (most_accurate_player_display_name, accuracy.max() * 100)
+            stats['most_accurate'] = (most_accurate_player_display_name, accuracy_dict[most_accurate_player_name])
 
     return fig, stats
