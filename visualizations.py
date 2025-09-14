@@ -5,22 +5,25 @@ import plotly.graph_objects as go
 import networkx as nx
 import plotly.colors as pcolors
 import matplotlib.pyplot as plt
-from data_loader import prepare_shot_map_data, prepare_pass_network_data, calculate_minutes_played
+from data_loader import prepare_shot_map_data, prepare_pass_network_data, calculate_minutes_played, get_player_display_name
 
-def plot_player_radar_chart(player_stats, player_name, theme="green"):
+def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_stats=None, player_2_name=None):
     """
     Create a radar chart for player statistics using Plotly
+    Supports comparison mode with two players
     """
     if not player_stats:
         return None
     
     # Define radar categories and their corresponding normalized stats
     categories = [
-        ('Defensive Actions', 'defensive_actions'),
+        ('Defending', 'defending'),
         ('Passing', 'passing'),
-        ('G+A', 'g_a'),
+        ('Ball Carrying', 'ball_carrying'),
         ('Dribbling', 'dribbling'),
-        ('Key Passes', 'key_passes')
+        ('Creativity', 'creativity'),
+        ('Work Rate', 'work_rate'),
+        ('Goal Threat', 'goal_threat')
     ]
     
     # Extract values for radar chart
@@ -31,64 +34,196 @@ def plot_player_radar_chart(player_stats, player_name, theme="green"):
     values += values[:1]
     category_names += category_names[:1]
     
-    # Theme colors
+    # Enhanced professional color palettes with refined contrast and visual appeal
     if theme == "white":
-        bg_color = "#f7f7f7"
-        line_color = "#333333"
-        fill_color = "rgba(31, 119, 180, 0.3)"
-        text_color = "#111111"
+        bg_color = "#ffffff"
+        line_color = "#2c3e50"
+        grid_color = "rgba(189, 195, 199, 0.5)"  # Subtle gray with transparency
+        fill_color_1 = "rgba(52, 152, 219, 0.1)"  # Refined blue with subtle transparency
+        fill_color_2 = "rgba(231, 76, 60, 0.1)"   # Refined red with subtle transparency
+        line_color_1 = "#3498db"  # Brighter blue
+        line_color_2 = "#e74c3c"  # Brighter red
+        text_color = "#2c3e50"    # Dark blue-gray
+        title_color = "#34495e"   # Slightly darker blue-gray
+        hover_bg = "#2c3e50"
+        hover_text = "#ffffff"
     elif theme == "black":
-        bg_color = "#000000"
-        line_color = "#e6e6e6"
-        fill_color = "rgba(46, 204, 113, 0.3)"
-        text_color = "#e6e6e6"
+        bg_color = "#0d1117"      # GitHub Dark theme inspired
+        line_color = "#f0f6fc"    # Light gray-blue
+        grid_color = "rgba(56, 66, 78, 0.5)"  # Subtle grid lines
+        fill_color_1 = "rgba(88, 166, 255, 0.12)"  # GitHub blue with subtle transparency
+        fill_color_2 = "rgba(246, 185, 59, 0.12)"  # Gold with subtle transparency
+        line_color_1 = "#58a6ff"  # GitHub blue
+        line_color_2 = "#f6b93b"  # Gold
+        text_color = "#f0f6fc"    # Light gray-blue
+        title_color = "#ffffff"
+        hover_bg = "#ffffff"
+        hover_text = "#000000"
     else:  # green
-        bg_color = "#2d5e2e"
-        line_color = "white"
-        fill_color = "rgba(255, 255, 255, 0.3)"
-        text_color = "white"
+        bg_color = "#042712"      # Deeper forest green
+        line_color = "#ffffff"
+        grid_color = "rgba(255, 255, 255, 0.15)"
+        fill_color_1 = "rgba(233, 236, 239, 0.10)"  # Light gray with subtle transparency
+        fill_color_2 = "rgba(255, 221, 87, 0.10)"   # Gold with subtle transparency
+        line_color_1 = "#e9ecef"  # Light gray
+        line_color_2 = "#ffd757"  # Gold
+        text_color = "#ffffff"
+        title_color = "#ffffff"
+        hover_bg = "#ffffff"
+        hover_text = "#000000"
     
     fig = go.Figure()
     
+    # Add first player trace with smoother lines and better styling
     fig.add_trace(go.Scatterpolar(
         r=values,
         theta=category_names,
         fill='toself',
-        fillcolor=fill_color,
-        line=dict(color=line_color, width=2),
+        fillcolor=fill_color_1,
+        line=dict(color=line_color_1, width=3, smoothing=1.3),
+        marker=dict(size=10, color=line_color_1, symbol="circle", line=dict(color="#ffffff", width=1)),
         name=player_name,
-        hovertemplate='<b>%{theta}</b><br>Score: %{r:.1f}/100<extra></extra>'
+        hovertemplate=f'<b>{player_name}</b><br><b>%{{theta}}</b><br>Score: %{{r:.1f}}/100<extra></extra>',
+        hoverlabel=dict(
+            bgcolor=hover_bg,
+            font=dict(color=hover_text, size=14, family="Arial"),
+            bordercolor=hover_bg
+        ),
+        hoverinfo='r+theta'
     ))
     
+    # Add second player trace if in comparison mode with smoother lines
+    if player_2_stats and player_2_name:
+        values_2 = [player_2_stats.get(cat[1], 0) for cat in categories]
+        values_2 += values_2[:1]  # Close the chart
+        
+        fig.add_trace(go.Scatterpolar(
+            r=values_2,
+            theta=category_names,
+            fill='toself',
+            fillcolor=fill_color_2,
+            line=dict(color=line_color_2, width=3, smoothing=1.3),
+            marker=dict(size=10, color=line_color_2, symbol="circle", line=dict(color="#ffffff", width=1)),
+            name=player_2_name,
+            hovertemplate=f'<b>{player_2_name}</b><br><b>%{{theta}}</b><br>Score: %{{r:.1f}}/100<extra></extra>',
+            hoverlabel=dict(
+                bgcolor=hover_bg,
+                font=dict(color=hover_text, size=14, family="Arial"),
+                bordercolor=hover_bg
+            ),
+            hoverinfo='r+theta'
+        ))
+    
+    # Enhanced layout with more professional styling - FIXED POLAR AXIS CONFIG
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
                 range=[0, 100],
-                gridcolor=line_color,
-                gridwidth=1,
+                gridcolor=grid_color,
+                gridwidth=1.5,  # Slightly thicker grid lines for better visibility
                 tickcolor=text_color,
-                tickfont=dict(color=text_color, size=10)
+                tickfont=dict(color=text_color, size=11, family="Arial"),
+                tickvals=[20, 40, 60, 80, 100],
+                ticktext=["20", "40", "60", "80", "100"],
+                linecolor=grid_color,
+                linewidth=1,
+                showticklabels=True,
+                tickangle=0,
+                layer="below traces"
             ),
             angularaxis=dict(
-                gridcolor=line_color,
-                gridwidth=1,
+                gridcolor=grid_color,
+                gridwidth=1.5,  # Slightly thicker grid lines
                 tickcolor=text_color,
-                tickfont=dict(color=text_color, size=12)
+                tickfont=dict(color=text_color, size=13, family="Arial", weight="bold"),
+                linecolor="rgba(0,0,0,0)",  # Hide the circular line
+                linewidth=0,
+                rotation=90,  # Start from top
+                direction="clockwise",
+                layer="below traces"
             ),
             bgcolor=bg_color
         ),
-        showlegend=False,
-        title=dict(
-            text=f"{player_name} - Performance Radar",
+        showlegend=bool(player_2_stats and player_2_name),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.15,
+            xanchor="center",
             x=0.5,
-            font=dict(size=18, color=text_color)
+            font=dict(color=text_color, size=13, family="Arial"),
+            bgcolor="rgba(0,0,0,0)",
+            bordercolor="rgba(0,0,0,0)"
+        ),
+        title=dict(
+            text=f"<b>{player_name} vs {player_2_name}</b>" if (player_2_stats and player_2_name) else f"<b>{player_name}</b>",
+            x=0.5,
+            y=0.95,
+            font=dict(size=22, color=title_color, family="Arial", weight="bold"),
+            xanchor="center"
         ),
         plot_bgcolor=bg_color,
         paper_bgcolor=bg_color,
-        height=600,
-        width=600,
-        margin=dict(l=80, r=80, t=80, b=80)
+        height=700,
+        width=700,
+        margin=dict(l=80, r=80, t=100, b=80),
+        font=dict(family="Arial")
+    )
+    
+    # Add performance indicators with improved styling
+    if player_stats:
+        # Calculate overall performance score
+        avg_score = sum(player_stats.get(cat[1], 0) for cat in categories) / len(categories)
+        
+        # Performance level text with refined thresholds
+        if avg_score >= 85:
+            performance_text = "Elite"
+            performance_color = "#27ae60"
+        elif avg_score >= 70:
+            performance_text = "Excellent"
+            performance_color = "#2ecc71"
+        elif avg_score >= 55:
+            performance_text = "Good"
+            performance_color = "#f39c12"
+        elif avg_score >= 40:
+            performance_text = "Average"
+            performance_color = "#e67e22"
+        else:
+            performance_text = "Below Average"
+            performance_color = "#e74c3c"
+        
+        # Add performance indicator with better styling
+        if not (player_2_stats and player_2_name):  # Only show for single player view
+            fig.add_annotation(
+                x=0.02, y=0.98,
+                xref="paper", yref="paper",
+                text=f"<b>Overall: {avg_score:.0f}/100</b><br><span style='color:{performance_color};font-weight:bold'>{performance_text}</span>",
+                showarrow=False,
+                font=dict(size=14, color=text_color, family="Arial"),
+                bgcolor="rgba(255,255,255,0.07)" if theme != "white" else "rgba(0,0,0,0.03)",
+                bordercolor=grid_color,
+                borderwidth=1,
+                borderpad=8,
+                align="left",
+                xanchor="left",
+                yanchor="top"
+            )
+    
+    # Add improved legend explaining what the scores mean
+    fig.add_annotation(
+        x=-0.12, y=-0.16,
+        xref="paper", yref="paper",
+        text="<b>Score Explanation:</b><br>0-100 = Percentile rank vs all players<br><i>e.g., 75 = better than 75% of players</i>",
+        showarrow=False,
+        font=dict(size=12, color=text_color, family="Arial"),
+        bgcolor="rgba(255,255,255,0.07)" if theme != "white" else "rgba(0,0,0,0.03)",
+        bordercolor=grid_color,
+        borderwidth=1,
+        borderpad=8,
+        align="left",
+        xanchor="left",
+        yanchor="bottom"
     )
     
     return fig
@@ -178,13 +313,13 @@ def plotly_penalty_map_center_only(
     # Scatter plot
     is_penalty = shot_data['is_penalty']
     if is_penalty:
-        hover_text = shots.apply(lambda row: f"{row['player']}<br>{row['team']} vs {row['opponent_team']}<br>{'Shootout' if row['period']==5 else 'Regular Play'}<br>{row['shot_body_part']}<br>xG: {row.get('shot_statsbomb_xg', 0):.2f}", axis=1)
+        hover_text = shots.apply(lambda row: f"{get_player_display_name(row['player'])}<br>{row['team']} vs {row['opponent_team']}<br>{'Shootout' if row['period']==5 else 'Regular Play'}<br>{row['shot_body_part']}<br>xG: {row.get('shot_statsbomb_xg', 0):.2f}", axis=1)
     else:
         def get_pattern_or_penalty(row):
             if row.get('shot_type', '') == 'Penalty':
                 return 'Penalty'
             return row.get('play_pattern', '')
-        hover_text = shots.apply(lambda row: f"{row['player']}<br>{row['team']} vs {row['opponent_team']}<br>{get_pattern_or_penalty(row)}<br>{row['shot_body_part']}<br>xG: {row.get('shot_statsbomb_xg', 0):.2f}", axis=1)
+        hover_text = shots.apply(lambda row: f"{get_player_display_name(row['player'])}<br>{row['team']} vs {row['opponent_team']}<br>{get_pattern_or_penalty(row)}<br>{row['shot_body_part']}<br>xG: {row.get('shot_statsbomb_xg', 0):.2f}", axis=1)
     
     if is_penalty:
         sizes = [12] * len(shots)
@@ -543,6 +678,9 @@ def plot_pass_network_plotly(
     passes_by_jersey = {name_to_jersey.get(p, ''): c for p, c in player_pass_counts.items()}
     received_by_jersey = {name_to_jersey.get(p, ''): c for p, c in recipient_pass_counts.items()}
 
+    # Calculate key passes per player
+    key_passes_counts = team_passes[team_passes['pass_shot_assist'] == True]['player'].value_counts().to_dict()
+
     # Calculate centrality ranks
     centrality_ranks = {}
     betweenness_ranks = {}
@@ -565,6 +703,7 @@ def plot_pass_network_plotly(
         centrality_rank = centrality_ranks.get(j, 'N/A')
         betweenness_rank = betweenness_ranks.get(j, 'N/A')
         prog_passes = progressive_passes.get(full_player_name, 0)
+        key_passes = key_passes_counts.get(full_player_name, 0)
         pressure_success, pressure_attempts = pass_success_under_pressure.get(full_player_name, (0, 0))
         
         # Calculate minutes played
@@ -573,7 +712,7 @@ def plot_pass_network_plotly(
         # Get individual pass accuracy
         player_accuracy = pass_accuracy.get(full_player_name, 0)
         
-        text = f"#{j} {player_name}<br>Minutes Played: {minutes_played}<br>Passes Given: {total_passes}<br>Passes Received: {received_passes}<br>Pass Accuracy: {player_accuracy:.1f}%<br>Centrality Rank: {centrality_rank}<br>Betweenness Rank: {betweenness_rank}<br>Progressive Passes: {prog_passes}"
+        text = f"#{j} {player_name}<br>Minutes Played: {minutes_played}<br>Passes Given: {total_passes}<br>Passes Received: {received_passes}<br>Pass Accuracy: {player_accuracy:.1f}%<br>Centrality Rank: {centrality_rank}<br>Betweenness Rank: {betweenness_rank}<br>Progressive Passes: {prog_passes}<br>Key Passes: {key_passes}"
         
         if pressure_attempts > 0:
             text += f"<br>Under Pressure: {pressure_success:.1f}% ({pressure_attempts} att)"
@@ -680,14 +819,14 @@ def plot_pass_network_plotly(
         min_centrality_node = min(centrality_full, key=centrality_full.get)
         max_player_name = jersey_to_display_name.get(str(max_centrality_node), str(max_centrality_node))
         min_player_name = jersey_to_display_name.get(str(min_centrality_node), str(min_centrality_node))
-        stats['max_centrality'] = (max_player_name, 1)
-        stats['min_centrality'] = (min_player_name, len(centrality_full))
+        stats['max_centrality'] = (max_player_name, 1, str(max_centrality_node))
+        stats['min_centrality'] = (min_player_name, len(centrality_full), str(min_centrality_node))
 
     # Betweenness Centrality (playmaker identification)
     if betweenness_centrality_full:
         max_betweenness_node = max(betweenness_centrality_full, key=betweenness_centrality_full.get)
         max_betweenness_player = jersey_to_display_name.get(str(max_betweenness_node), str(max_betweenness_node))
-        stats['max_betweenness'] = (max_betweenness_player, 1)
+        stats['max_betweenness'] = (max_betweenness_player, 1, str(max_betweenness_node))
 
     # Progressive Passes
     if progressive_passes:
@@ -697,7 +836,8 @@ def plot_pass_network_plotly(
             most_progressive_display = team_nicknames[most_progressive_player]
         else:
             most_progressive_display = most_progressive_player
-        stats['most_progressive'] = (most_progressive_display, progressive_passes[most_progressive_player])
+        jersey = team_numbers.get(most_progressive_player, '')
+        stats['most_progressive'] = (most_progressive_display, progressive_passes[most_progressive_player], jersey)
 
     # Pass success under pressure
     pressure_players = {p: data for p, data in pass_success_under_pressure.items() if data[1] >= 5}
@@ -709,7 +849,8 @@ def plot_pass_network_plotly(
         else:
             best_pressure_display = best_under_pressure_player
         pressure_rate, pressure_attempts = pressure_players[best_under_pressure_player]
-        stats['best_under_pressure'] = (best_pressure_display, pressure_rate, pressure_attempts)
+        jersey = team_numbers.get(best_under_pressure_player, '')
+        stats['best_under_pressure'] = (best_pressure_display, pressure_rate, pressure_attempts, jersey)
 
     # Network density
     stats['network_density'] = network_density * 100
@@ -721,7 +862,8 @@ def plot_pass_network_plotly(
             most_passes_player_display_name = team_nicknames[most_passes_player_name]
         else:
             most_passes_player_display_name = most_passes_player_name
-        stats['most_passes'] = (most_passes_player_display_name, player_pass_counts[most_passes_player_name])
+        jersey = team_numbers.get(most_passes_player_name, '')
+        stats['most_passes'] = (most_passes_player_display_name, player_pass_counts[most_passes_player_name], jersey)
 
     # Most received passes
     recipient_counts = team_passes['pass_recipient'].value_counts()
@@ -731,11 +873,12 @@ def plot_pass_network_plotly(
              most_received_player_display_name = team_nicknames[most_received_player_name]
         else:
             most_received_player_display_name = most_received_player_name
-        stats['most_received'] = (most_received_player_display_name, recipient_counts.iloc[0])
+        jersey = team_numbers.get(most_received_player_name, '')
+        stats['most_received'] = (most_received_player_display_name, recipient_counts.iloc[0], jersey)
 
     # Pass accuracy - using corrected calculation
     passer_counts = team_passes['player'].value_counts()
-    passer_counts = passer_counts[passer_counts >= 50]  # At least 50 passes
+    passer_counts = passer_counts[passer_counts >= 30]  # At least 30 passes
     
     if not passer_counts.empty:
         accuracy_dict = {}
@@ -748,6 +891,20 @@ def plot_pass_network_plotly(
                 most_accurate_player_display_name = team_nicknames[most_accurate_player_name]
             else:
                 most_accurate_player_display_name = most_accurate_player_name
-            stats['most_accurate'] = (most_accurate_player_display_name, accuracy_dict[most_accurate_player_name])
+            jersey = team_numbers.get(most_accurate_player_name, '')
+            stats['most_accurate'] = (most_accurate_player_display_name, accuracy_dict[most_accurate_player_name], jersey)
+
+    # Most key passes
+    key_passes_df = team_passes[team_passes['pass_shot_assist'] == True]
+    if not key_passes_df.empty:
+        key_passes_counts = key_passes_df['player'].value_counts()
+        if not key_passes_counts.empty:
+            most_key_passes_player_name = key_passes_counts.index[0]
+            if most_key_passes_player_name in team_nicknames:
+                most_key_passes_display_name = team_nicknames[most_key_passes_player_name]
+            else:
+                most_key_passes_display_name = most_key_passes_player_name
+            jersey = team_numbers.get(most_key_passes_player_name, '')
+            stats['most_key_passes'] = (most_key_passes_display_name, key_passes_counts.iloc[0], jersey)
 
     return fig, stats

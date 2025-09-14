@@ -46,6 +46,15 @@ def load_data():
     # Reset index for easier merging
     fifty_fifty_stats = fifty_fifty_stats[['successful', 'unsuccessful', 'total']].reset_index()
 
+    # Replace competition_stage for group stage matches with their group letter
+    group_teams = groups[['team', 'group']].dropna()
+    matches['competition_stage'] = matches.apply(
+        lambda row: group_teams[group_teams['team'] == row['home_team']]['group'].iloc[0]
+        if row['competition_stage'] == 'Group Stage' and not group_teams[group_teams['team'] == row['home_team']].empty
+        else row['competition_stage'],
+        axis=1
+    )
+
     # Return the original, complete matches dataframe
     return shots_euro, matches, passes, lineups, groups, events, fifty_fifties, fifty_fifty_stats
 
@@ -340,12 +349,7 @@ def prepare_pass_network_data(passes_euro, lineups, match_id, team_name, xgchain
         'pass_accuracy': pass_accuracy
     }
     
-    
-# a player radar map with:
-#       passing(aggregate, keypasses, progressive passes, accuracy, number of passes),
-#       carrys, dribbling, shooting/xg , goals/assists, 50/50s % won, pressure play,
-#       defensive actions(tackles, interceptions, blocks, recoveries, clearances, dribbled past)
-#
+
 
 def calculate_tournament_xgchain(events, team_name):
     """Calculate xGChain for a team across the entire tournament"""
@@ -449,34 +453,33 @@ def get_tournament_player_mappings(lineups, team_name, starting_11):
     
     return team_numbers, team_nicknames
 
-def calculate_player_radar_stats(events, passes, shots, match_id, team_name, player_name):
+def calculate_player_radar_stats(all_events, passes_euro, shots_euro, match_id, team_name, player_name):
     """
-    Calculate comprehensive radar chart statistics for a player
-    If match_id is None, calculate tournament-wide stats
+    Calculate comprehensive player statistics for radar chart
     """
     # Filter data for specific team and player (and match if specified)
     if match_id is not None:
-        player_events = events[(events['match_id'] == match_id) & 
-                              (events['team'] == team_name) & 
-                              (events['player'] == player_name)]
+        player_events = all_events[(all_events['match_id'] == match_id) & 
+                              (all_events['team'] == team_name) & 
+                              (all_events['player'] == player_name)]
         
-        player_passes = passes[(passes['match_id'] == match_id) & 
-                              (passes['team'] == team_name) & 
-                              (passes['player'] == player_name)]
+        player_passes = passes_euro[(passes_euro['match_id'] == match_id) & 
+                              (passes_euro['team'] == team_name) & 
+                              (passes_euro['player'] == player_name)]
         
-        player_shots = shots[(shots['match_id'] == match_id) & 
-                            (shots['team'] == team_name) & 
-                            (shots['player'] == player_name)]
+        player_shots = shots_euro[(shots_euro['match_id'] == match_id) & 
+                            (shots_euro['team'] == team_name) & 
+                            (shots_euro['player'] == player_name)]
     else:
         # Tournament-wide stats
-        player_events = events[(events['team'] == team_name) & 
-                              (events['player'] == player_name)]
+        player_events = all_events[(all_events['team'] == team_name) & 
+                              (all_events['player'] == player_name)]
         
-        player_passes = passes[(passes['team'] == team_name) & 
-                              (passes['player'] == player_name)]
+        player_passes = passes_euro[(passes_euro['team'] == team_name) & 
+                              (passes_euro['player'] == player_name)]
         
-        player_shots = shots[(shots['team'] == team_name) & 
-                            (shots['player'] == player_name)]
+        player_shots = shots_euro[(shots_euro['team'] == team_name) & 
+                            (shots_euro['player'] == player_name)]
     
     if player_events.empty:
         return None
@@ -506,6 +509,49 @@ def calculate_player_radar_stats(events, passes, shots, match_id, team_name, pla
     carries = player_events[player_events['type'] == 'Carry']
     stats['carries'] = len(carries)
     
+    # Progressive carries (carries that move ball forward significantly)
+    progressive_carries = 0
+    for _, carry in carries.iterrows():
+        if pd.notna(carry.get('carry_end_location')) and pd.notna(carry.get('location')):
+            try:
+                start_loc = eval(carry['location']) if isinstance(carry['location'], str) else carry['location']
+                end_loc = eval(carry['carry_end_location']) if isinstance(carry['carry_end_location'], str) else carry['carry_end_location']
+                
+                if start_loc and end_loc and len(start_loc) >= 2 and len(end_loc) >= 2:
+                    forward_progress = end_loc[0] - start_loc[0]
+                    if forward_progress >= 15:  # Progressive carry if 15+ meters forward
+                        progressive_carries += 1
+            except:
+                continue
+    
+    stats['progressive_carries'] = progressive_carries
+    
+    # Carries into final third
+    final_third_carries = 0
+    for _, carry in carries.iterrows():
+        if pd.notna(carry.get('carry_end_location')):
+            try:
+                end_loc = eval(carry['carry_end_location']) if isinstance(carry['carry_end_location'], str) else carry['carry_end_location']
+                if end_loc and len(end_loc) >= 2 and end_loc[0] >= 80:  # Final third starts at x=80
+                    final_third_carries += 1
+            except:
+                continue
+    
+    stats['final_third_carries'] = final_third_carries
+    
+    # Carries into penalty area
+    penalty_area_carries = 0
+    for _, carry in carries.iterrows():
+        if pd.notna(carry.get('carry_end_location')):
+            try:
+                end_loc = eval(carry['carry_end_location']) if isinstance(carry['carry_end_location'], str) else carry['carry_end_location']
+                if end_loc and len(end_loc) >= 2 and end_loc[0] >= 102 and 18 <= end_loc[1] <= 62:  # Penalty area
+                    penalty_area_carries += 1
+            except:
+                continue
+    
+    stats['penalty_area_carries'] = penalty_area_carries
+    
     dribbles = player_events[player_events['type'] == 'Dribble']
     successful_dribbles = dribbles[dribbles['dribble_outcome'].isin(['Complete', 'Successful'])]
     stats['dribbles_completed'] = len(successful_dribbles)
@@ -514,12 +560,43 @@ def calculate_player_radar_stats(events, passes, shots, match_id, team_name, pla
     # SHOOTING & ATTACKING
     stats['shots'] = len(player_shots)
     stats['goals'] = len(player_shots[player_shots['shot_outcome'] == 'Goal'])
-    stats['xg'] = player_shots['shot_statsbomb_xg'].sum() if 'shot_statsbomb_xg' in player_shots.columns else 0
-    
+    # Non-penalty goals
+    non_penalty_goals = player_shots[(player_shots['shot_outcome'] == 'Goal') & (player_shots['shot_type'] != 'Penalty')]
+    stats['non_penalty_goals'] = len(non_penalty_goals)
+    # Non-penalty xG (exclude penalty shots from xG calculation)
+    non_penalty_shots = player_shots[player_shots['shot_type'] != 'Penalty']
+    stats['xg'] = non_penalty_shots['shot_statsbomb_xg'].sum() if 'shot_statsbomb_xg' in non_penalty_shots.columns else 0
+    stats['non_penalty_xg'] = stats['xg']  # Since we already excluded penalties above
+
     # Assists
     assists = player_events[player_events['pass_goal_assist'] == True]
     stats['assists'] = len(assists)
     
+    # Expected assists (xA) - sum of xG from shots that came from this player's passes
+    expected_assists = 0
+    key_passes_with_xg = player_events[player_events['pass_shot_assist'] == True]
+    if not key_passes_with_xg.empty:
+        # For each key pass, try to find the corresponding shot and get its xG
+        for _, key_pass in key_passes_with_xg.iterrows():
+            # Look for shots shortly after this key pass in the same possession
+            match_events = all_events[all_events['match_id'] == key_pass['match_id']]
+            possession_shots = match_events[
+                (match_events['possession'] == key_pass['possession']) &
+                (match_events['type'] == 'Shot') &
+                (match_events['minute'] >= key_pass['minute'])
+            ]
+            if not possession_shots.empty:
+                # Add the xG of the first shot after this key pass
+                shot_xg = possession_shots.iloc[0].get('shot_statsbomb_xg', 0)
+                if pd.notna(shot_xg):
+                    expected_assists += shot_xg
+    
+    stats['expected_assists'] = expected_assists
+    
+    # Non-penalty G+A and xG+xA
+    stats['non_penalty_g_a'] = stats['non_penalty_goals'] + stats['assists']
+    stats['non_penalty_xg_xa'] = stats['non_penalty_xg'] + stats['expected_assists']
+
     # 50/50s WON
     fifty_fifties = player_events[player_events['type'] == 'Duel']
     fifty_fifties_won = fifty_fifties[fifty_fifties['duel_outcome'].isin(['Won', 'Success To Team'])]
@@ -534,13 +611,10 @@ def calculate_player_radar_stats(events, passes, shots, match_id, team_name, pla
     stats['pass_success_under_pressure'] = pressure_stats.get(player_name, (0, 0))[0]
     
     # DEFENSIVE ACTIONS
-    # Filter for duel events that are tackles and were not lost.
-    # A tackle is a type of duel. The outcome is only recorded for tackles.
-    # Successful tackles are those not 'Lost In Play' or 'Lost Out'.
     tackles = player_events[
         (player_events['type'] == 'Duel') &
         (player_events['duel_type'] == 'Tackle') &
-        (~player_events['duel_outcome'].isin(['Lost In Play']))#, 'Lost Out'
+        (~player_events['duel_outcome'].isin(['Lost In Play']))
     ]
     stats['tackles'] = len(tackles)
     
@@ -560,6 +634,34 @@ def calculate_player_radar_stats(events, passes, shots, match_id, team_name, pla
     dribbled_past = player_events[player_events['type'] == 'Dribbled Past']
     stats['dribbled_past'] = len(dribbled_past)
     
+    # CREATIVITY METRICS
+    # Through balls and long passes
+    through_balls = player_passes[player_passes['pass_type'].str.contains('Through Ball', na=False)]
+    stats['through_balls'] = len(through_balls)
+    
+    # Long passes (over 30 meters)
+    long_passes = player_passes.copy()
+    long_pass_count = 0
+    for _, pass_row in long_passes.iterrows():
+        start_loc = eval(pass_row['location']) if isinstance(pass_row['location'], str) else pass_row['location']
+        end_loc = eval(pass_row['pass_end_location']) if isinstance(pass_row['pass_end_location'], str) else pass_row['pass_end_location']
+        
+        if start_loc and end_loc and len(start_loc) >= 2 and len(end_loc) >= 2:
+            distance = ((end_loc[0] - start_loc[0])**2 + (end_loc[1] - start_loc[1])**2)**0.5
+            if distance >= 30:
+                long_pass_count += 1
+    
+    stats['long_passes'] = long_pass_count
+    
+    # Passes into final third
+    final_third_passes = 0
+    for _, pass_row in player_passes.iterrows():
+        end_loc = eval(pass_row['pass_end_location']) if isinstance(pass_row['pass_end_location'], str) else pass_row['pass_end_location']
+        if end_loc and len(end_loc) >= 2 and end_loc[0] >= 80:  # Final third starts at x=80
+            final_third_passes += 1
+    
+    stats['final_third_passes'] = final_third_passes
+    
     # Calculate total minutes played across all matches
     if match_id is not None:
         minutes_played = calculate_minutes_played(player_events, player_name)
@@ -574,61 +676,170 @@ def calculate_player_radar_stats(events, passes, shots, match_id, team_name, pla
     
     stats['minutes_played'] = minutes_played
     
-    # Convert to per 90 minute rates where appropriate
+    # Convert to per 90 minute rates for ALL stats including carry metrics
     if minutes_played > 0:
         rate_multiplier = 90 / minutes_played
         
+        # Passing stats per 90
         stats['passes_per_90'] = total_passes * rate_multiplier
         stats['key_passes_per_90'] = stats['key_passes'] * rate_multiplier
         stats['progressive_passes_per_90'] = stats['progressive_passes'] * rate_multiplier
+        
+        # Attacking stats per 90
+        stats['shots_per_90'] = stats['shots'] * rate_multiplier
+        stats['goals_per_90'] = stats['goals'] * rate_multiplier
+        stats['non_penalty_goals_per_90'] = stats['non_penalty_goals'] * rate_multiplier
+        stats['assists_per_90'] = stats['assists'] * rate_multiplier
+        stats['xg_per_90'] = stats['xg'] * rate_multiplier
+        stats['non_penalty_xg_per_90'] = stats['non_penalty_xg'] * rate_multiplier
+        
+        # Dribbling and carry stats per 90
+        stats['dribbles_completed_per_90'] = stats['dribbles_completed'] * rate_multiplier
+        stats['carries_per_90'] = stats['carries'] * rate_multiplier
+        stats['progressive_carries_per_90'] = stats['progressive_carries'] * rate_multiplier
+        stats['final_third_carries_per_90'] = stats['final_third_carries'] * rate_multiplier
+        stats['penalty_area_carries_per_90'] = stats['penalty_area_carries'] * rate_multiplier
+        
+        # Defensive stats per 90
         stats['tackles_per_90'] = stats['tackles'] * rate_multiplier
         stats['interceptions_per_90'] = stats['interceptions'] * rate_multiplier
         stats['recoveries_per_90'] = stats['recoveries'] * rate_multiplier
+        stats['blocks_per_90'] = stats['blocks'] * rate_multiplier
+        stats['clearances_per_90'] = stats['clearances'] * rate_multiplier
+        stats['50_50s_won_per_90'] = stats['50_50s_won'] * rate_multiplier
         stats['pressures_per_90'] = stats['pressures'] * rate_multiplier
+        
+        # Creativity stats per 90
+        stats['through_balls_per_90'] = stats['through_balls'] * rate_multiplier
+        stats['long_passes_per_90'] = stats['long_passes'] * rate_multiplier
+        stats['final_third_passes_per_90'] = stats['final_third_passes'] * rate_multiplier
+        
+        # Add per-90 rates for new metrics
+        stats['expected_assists_per_90'] = stats['expected_assists'] * rate_multiplier
+        stats['non_penalty_xg_xa_per_90'] = stats['non_penalty_xg_xa'] * rate_multiplier
+        
+    else:
+        # Set all per-90 stats to 0 if no minutes played (now includes carry stats)
+        for stat in ['passes', 'key_passes', 'progressive_passes', 'shots', 'goals', 'non_penalty_goals', 'assists', 'xg', 'non_penalty_xg',
+                    'dribbles_completed', 'carries', 'progressive_carries', 'final_third_carries', 'penalty_area_carries', 
+                    'tackles', 'interceptions', 'recoveries', 'blocks', 'clearances', '50_50s_won', 'pressures',
+                    'through_balls', 'long_passes', 'final_third_passes']:
+            stats[f'{stat}_per_90'] = 0
     
     return stats
 
 def normalize_radar_stats(all_player_stats):
     """
-    Normalize player stats to 0-100 scale for radar chart
-    Takes dictionary of {player_name: stats_dict}
+    Normalize player stats to 0-100 scale for radar chart using percentile ranks
+    Creates aggregated categories for radar visualization
     """
     if not all_player_stats:
         return {}
     
-    # Define which stats to normalize (exclude rates that are already percentages)
-    stats_to_normalize = [
-        'passes_per_90', 'key_passes_per_90', 'progressive_passes_per_90',
-        'tackles_per_90', 'interceptions_per_90', 'recoveries_per_90', 
-        'pressures_per_90', 'xg', 'shots', 'goals', 'assists'
+    # Use percentile-based normalization instead of min-max
+    import scipy.stats as stats
+    
+    # Calculate percentile ranks for each stat using per-90 stats (now includes carry stats)
+    stats_to_track = [
+        'tackles_per_90', 'interceptions_per_90', 'recoveries_per_90', 'blocks_per_90', 'clearances_per_90',
+        'passes_per_90', 'pass_accuracy', 'progressive_passes_per_90', 'key_passes_per_90',
+        'non_penalty_goals_per_90', 'assists_per_90', 'xg_per_90',
+        'dribbles_completed_per_90', 'dribble_success_rate', 'carries_per_90', 'progressive_carries_per_90', 
+        'final_third_carries_per_90', 'penalty_area_carries_per_90',
+        '50_50s_won_per_90', 'pressures_per_90',
+        'through_balls_per_90', 'long_passes_per_90', 'final_third_passes_per_90'
     ]
     
-    # Calculate min/max for each stat across all players
-    stat_ranges = {}
-    for stat in stats_to_normalize:
+    # Create arrays of values for percentile calculation
+    stat_arrays = {}
+    for stat in stats_to_track:
         values = [player_stats.get(stat, 0) for player_stats in all_player_stats.values()]
-        if values:
-            stat_ranges[stat] = {'min': min(values), 'max': max(values)}
+        stat_arrays[stat] = np.array(values)
     
-    # Normalize each player's stats
+    # Normalize each player's stats and create aggregated categories
     normalized_stats = {}
-    for player_name, stats in all_player_stats.items():
-        normalized = stats.copy()
+    for player_name, player_stats in all_player_stats.items():
+        normalized = {}
         
-        # Normalize count-based stats to 0-100 scale
-        for stat in stats_to_normalize:
-            if stat in stat_ranges and stat_ranges[stat]['max'] > stat_ranges[stat]['min']:
-                min_val = stat_ranges[stat]['min']
-                max_val = stat_ranges[stat]['max']
-                raw_value = stats.get(stat, 0)
-                normalized[f'{stat}_normalized'] = ((raw_value - min_val) / (max_val - min_val)) * 100
-            else:
-                normalized[f'{stat}_normalized'] = 0
+        # Helper function to get percentile rank (0-100)
+        def get_percentile_rank(value, stat_name):
+            if stat_name not in stat_arrays:
+                return 0
+            values_array = stat_arrays[stat_name]
+            if len(values_array) <= 1:
+                return 50
+            percentile = stats.percentileofscore(values_array, value, kind='rank')
+            return percentile
         
-        # Keep percentage stats as-is (already 0-100)
-        percentage_stats = ['pass_accuracy', 'dribble_success_rate', 'duel_success_rate', 'pass_success_under_pressure']
-        for stat in percentage_stats:
-            normalized[f'{stat}_normalized'] = stats.get(stat, 0)
+        # 1. Defending (combines all defensive actions)
+        defending_components = []
+        for stat in ['tackles_per_90', 'interceptions_per_90', 'pressures_per_90', '50_50s_won_per_90', 
+                    'blocks_per_90', 'clearances_per_90', 'recoveries_per_90']:
+            percentile = get_percentile_rank(player_stats.get(stat, 0), stat)
+            defending_components.append(percentile)
+        normalized['defending'] = sum(defending_components) / len(defending_components) if defending_components else 0
+        
+        # 2. Passing (general passing including progressive, key passes, and accuracy)
+        progressive_percentile = get_percentile_rank(player_stats.get('progressive_passes_per_90', 0), 'progressive_passes_per_90')
+        key_passes_percentile = get_percentile_rank(player_stats.get('key_passes_per_90', 0), 'key_passes_per_90')
+        pass_accuracy = player_stats.get('pass_accuracy', 0)
+        pass_accuracy_percentile = get_percentile_rank(pass_accuracy, 'pass_accuracy')
+        passes_volume_percentile = get_percentile_rank(player_stats.get('passes_per_90', 0), 'passes_per_90')
+        
+        # Weighted average: progressive (30%) + key passes (25%) + accuracy (25%) + volume (20%)
+        normalized['passing'] = (progressive_percentile * 0.3 + key_passes_percentile * 0.25 + 
+                               pass_accuracy_percentile * 0.25 + passes_volume_percentile * 0.2)
+        
+        # 3. Ball Carrying (enhanced with progressive carries and attacking carries)
+        carries_volume_percentile = get_percentile_rank(player_stats.get('carries_per_90', 0), 'carries_per_90')
+        progressive_carries_percentile = get_percentile_rank(player_stats.get('progressive_carries_per_90', 0), 'progressive_carries_per_90')
+        final_third_carries_percentile = get_percentile_rank(player_stats.get('final_third_carries_per_90', 0), 'final_third_carries_per_90')
+        penalty_area_carries_percentile = get_percentile_rank(player_stats.get('penalty_area_carries_per_90', 0), 'penalty_area_carries_per_90')
+        
+        # Weight progressive and attacking carries more heavily
+        normalized['ball_carrying'] = (carries_volume_percentile * 0.25 + progressive_carries_percentile * 0.35 + 
+                                     final_third_carries_percentile * 0.25 + penalty_area_carries_percentile * 0.15)
+        
+        # 4. Dribbling (focuses purely on dribbling ability)
+        dribbles_percentile = get_percentile_rank(player_stats.get('dribbles_completed_per_90', 0), 'dribbles_completed_per_90')
+        dribble_success_percentile = get_percentile_rank(player_stats.get('dribble_success_rate', 0), 'dribble_success_rate')
+        
+        # If player attempted dribbles, weight volume and success rate
+        if player_stats.get('dribbles_completed', 0) > 0:
+            normalized['dribbling'] = (dribbles_percentile * 0.6 + dribble_success_percentile * 0.4)
+        else:
+            # If no dribbles attempted, give very low score
+            normalized['dribbling'] = dribble_success_percentile * 0.2
+        
+        # 5. Creativity (through balls, long passes, final third passes)
+        through_balls_percentile = get_percentile_rank(player_stats.get('through_balls_per_90', 0), 'through_balls_per_90')
+        long_passes_percentile = get_percentile_rank(player_stats.get('long_passes_per_90', 0), 'long_passes_per_90')
+        final_third_percentile = get_percentile_rank(player_stats.get('final_third_passes_per_90', 0), 'final_third_passes_per_90')
+        
+        # Weight different creativity aspects
+        normalized['creativity'] = (through_balls_percentile * 0.4 + long_passes_percentile * 0.3 + final_third_percentile * 0.3)
+        
+        # 6. Work Rate (activity level and energy - now includes carries)
+        work_rate_components = []
+        # Pressures and 50/50s show active engagement
+        for stat in ['pressures_per_90', '50_50s_won_per_90']:
+            percentile = get_percentile_rank(player_stats.get(stat, 0), stat)
+            work_rate_components.append(percentile)
+        
+        # Add carries and passes as indicators of involvement
+        carries_involvement = get_percentile_rank(player_stats.get('carries_per_90', 0), 'carries_per_90')
+        passes_involvement = get_percentile_rank(player_stats.get('passes_per_90', 0), 'passes_per_90')
+        work_rate_components.extend([carries_involvement, passes_involvement])
+        
+        normalized['work_rate'] = sum(work_rate_components) / len(work_rate_components) if work_rate_components else 0
+        
+        # 7. Goal Threat (non-penalty goals + assists + xG)
+        non_penalty_goals_percentile = get_percentile_rank(player_stats.get('non_penalty_goals_per_90', 0), 'non_penalty_goals_per_90')
+        assists_percentile = get_percentile_rank(player_stats.get('assists_per_90', 0), 'assists_per_90')
+        xg_percentile = get_percentile_rank(player_stats.get('xg_per_90', 0), 'xg_per_90')
+        
+        # Weight actual output more than expected
+        normalized['goal_threat'] = (non_penalty_goals_percentile * 0.4 + assists_percentile * 0.4 + xg_percentile * 0.2)
         
         normalized_stats[player_name] = normalized
     
@@ -674,3 +885,40 @@ def normalize_player_data(player_id, tournament_data):
 
     return normalized_data
 
+def get_player_display_name(player_name, lineups_df=None):
+    """
+    Get player display name, preferring nickname over full name
+    """
+    if lineups_df is None or lineups_df.empty:
+        return player_name
+    
+    # Find player in lineups
+    player_lineups = lineups_df[lineups_df['player_name'] == player_name]
+    if not player_lineups.empty:
+        # Get nickname if available
+        nicknames = player_lineups['player_nickname'].dropna()
+        if not nicknames.empty:
+            return nicknames.iloc[0]
+    
+    return player_name
+
+def get_team_player_display_names(team_name, lineups_df):
+    """
+    Get display names for all players in a team, preferring nicknames
+    """
+    if lineups_df.empty:
+        return {}
+    
+    team_lineups = lineups_df[lineups_df['team_name'] == team_name]
+    display_names = {}
+    
+    for _, player_row in team_lineups.iterrows():
+        player_name = player_row['player_name']
+        nickname = player_row['player_nickname']
+        
+        if pd.notna(nickname):
+            display_names[player_name] = nickname
+        else:
+            display_names[player_name] = player_name
+    
+    return display_names
