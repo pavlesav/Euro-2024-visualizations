@@ -7,13 +7,17 @@ import plotly.colors as pcolors
 import matplotlib.pyplot as plt
 from data_loader import prepare_shot_map_data, prepare_pass_network_data, calculate_minutes_played, get_player_display_name
 
-def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_stats=None, player_2_name=None):
+def plot_player_radar_chart(player_1_stats, player_1_name, player_2_stats, player_2_name, theme="green"):
     """
     Create a radar chart for player statistics using Plotly
-    Supports comparison mode with two players
+    Can handle both single player (when player_2_stats/name are None) and comparison mode
     """
-    if not player_stats:
+    # Require at least the first player
+    if not player_1_stats or not player_1_name:
         return None
+    
+    # Check if this is comparison mode
+    is_comparison_mode = player_2_stats is not None and player_2_name is not None
     
     # Define radar categories and their corresponding normalized stats
     categories = [
@@ -28,44 +32,48 @@ def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_s
     
     # Extract values for radar chart
     category_names = [cat[0] for cat in categories]
-    values = [player_stats.get(cat[1], 0) for cat in categories]
+    values_1 = [player_1_stats.get(cat[1], 0) for cat in categories]
     
     # Close the radar chart by adding first value at the end
-    values += values[:1]
+    values_1 += values_1[:1]
     category_names += category_names[:1]
+    
+    if is_comparison_mode:
+        values_2 = [player_2_stats.get(cat[1], 0) for cat in categories]
+        values_2 += values_2[:1]
     
     # Enhanced professional color palettes with refined contrast and visual appeal
     if theme == "white":
         bg_color = "#ffffff"
         line_color = "#2c3e50"
-        grid_color = "rgba(189, 195, 199, 0.5)"  # Subtle gray with transparency
-        fill_color_1 = "rgba(52, 152, 219, 0.1)"  # Refined blue with subtle transparency
-        fill_color_2 = "rgba(231, 76, 60, 0.1)"   # Refined red with subtle transparency
-        line_color_1 = "#3498db"  # Brighter blue
-        line_color_2 = "#e74c3c"  # Brighter red
-        text_color = "#2c3e50"    # Dark blue-gray
-        title_color = "#34495e"   # Slightly darker blue-gray
+        grid_color = "rgba(189, 195, 199, 0.5)"
+        fill_color_1 = "rgba(52, 152, 219, 0.1)"
+        fill_color_2 = "rgba(231, 76, 60, 0.1)"
+        line_color_1 = "#3498db"
+        line_color_2 = "#e74c3c"
+        text_color = "#2c3e50"
+        title_color = "#34495e"
         hover_bg = "#2c3e50"
         hover_text = "#ffffff"
     elif theme == "black":
-        bg_color = "#0d1117"      # GitHub Dark theme inspired
-        line_color = "#f0f6fc"    # Light gray-blue
-        grid_color = "rgba(56, 66, 78, 0.5)"  # Subtle grid lines
-        fill_color_1 = "rgba(88, 166, 255, 0.12)"  # GitHub blue with subtle transparency
-        fill_color_2 = "rgba(246, 185, 59, 0.12)"  # Gold with subtle transparency
-        line_color_1 = "#58a6ff"  # GitHub blue
-        line_color_2 = "#f6b93b"  # Gold
-        text_color = "#f0f6fc"    # Light gray-blue
+        bg_color = "#0d1117"
+        line_color = "#f0f6fc"
+        grid_color = "rgba(56, 66, 78, 0.5)"
+        fill_color_1 = "rgba(88, 166, 255, 0.12)"
+        fill_color_2 = "rgba(246, 185, 59, 0.12)"
+        line_color_1 = "#58a6ff"
+        line_color_2 = "#f6b93b"
+        text_color = "#f0f6fc"
         title_color = "#ffffff"
         hover_bg = "#ffffff"
         hover_text = "#000000"
     else:  # green
-        bg_color = "#042712"      # Deeper forest green
+        bg_color = "#042712"
         line_color = "#ffffff"
         grid_color = "rgba(255, 255, 255, 0.15)"
-        fill_color_1 = "rgba(233, 236, 239, 0.10)"  # Light gray with subtle transparency
-        fill_color_2 = "rgba(255, 221, 87, 0.10)"   # Gold with subtle transparency
-        line_color_1 = "#e9ecef"  # Light gray
+        fill_color_1 = "rgba(233, 236, 239, 0.10)"
+        fill_color_2 = "rgba(255, 221, 87, 0.10)"
+        line_color_1 = "#e9ecef"
         line_color_2 = "#ffd757"  # Gold
         text_color = "#ffffff"
         title_color = "#ffffff"
@@ -74,16 +82,16 @@ def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_s
     
     fig = go.Figure()
     
-    # Add first player trace with smoother lines and better styling
+    # Add first player trace
     fig.add_trace(go.Scatterpolar(
-        r=values,
+        r=values_1,
         theta=category_names,
         fill='toself',
         fillcolor=fill_color_1,
         line=dict(color=line_color_1, width=3, smoothing=1.3),
         marker=dict(size=10, color=line_color_1, symbol="circle", line=dict(color="#ffffff", width=1)),
-        name=player_name,
-        hovertemplate=f'<b>{player_name}</b><br><b>%{{theta}}</b><br>Score: %{{r:.1f}}/100<extra></extra>',
+        name=player_1_name,
+        hovertemplate=f'<b>{player_1_name}</b><br><b>%{{theta}}</b><br>Score: %{{r:.1f}}/100<extra></extra>',
         hoverlabel=dict(
             bgcolor=hover_bg,
             font=dict(color=hover_text, size=14, family="Arial"),
@@ -92,11 +100,8 @@ def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_s
         hoverinfo='r+theta'
     ))
     
-    # Add second player trace if in comparison mode with smoother lines
-    if player_2_stats and player_2_name:
-        values_2 = [player_2_stats.get(cat[1], 0) for cat in categories]
-        values_2 += values_2[:1]  # Close the chart
-        
+    # Add second player trace if in comparison mode
+    if is_comparison_mode:
         fig.add_trace(go.Scatterpolar(
             r=values_2,
             theta=category_names,
@@ -114,14 +119,14 @@ def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_s
             hoverinfo='r+theta'
         ))
     
-    # Enhanced layout with more professional styling - FIXED POLAR AXIS CONFIG
+    # Enhanced layout
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
                 range=[0, 100],
                 gridcolor=grid_color,
-                gridwidth=1.5,  # Slightly thicker grid lines for better visibility
+                gridwidth=1.5,
                 tickcolor=text_color,
                 tickfont=dict(color=text_color, size=11, family="Arial"),
                 tickvals=[20, 40, 60, 80, 100],
@@ -134,18 +139,18 @@ def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_s
             ),
             angularaxis=dict(
                 gridcolor=grid_color,
-                gridwidth=1.5,  # Slightly thicker grid lines
+                gridwidth=1.5,
                 tickcolor=text_color,
                 tickfont=dict(color=text_color, size=13, family="Arial", weight="bold"),
                 linecolor="rgba(0,0,0,0)",  # Hide the circular line
                 linewidth=0,
-                rotation=90,  # Start from top
+                rotation=90,
                 direction="clockwise",
                 layer="below traces"
             ),
             bgcolor=bg_color
         ),
-        showlegend=bool(player_2_stats and player_2_name),
+        showlegend=is_comparison_mode,
         legend=dict(
             orientation="h",
             yanchor="bottom",
@@ -157,7 +162,7 @@ def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_s
             bordercolor="rgba(0,0,0,0)"
         ),
         title=dict(
-            text=f"<b>{player_name} vs {player_2_name}</b>" if (player_2_stats and player_2_name) else f"<b>{player_name}</b>",
+            text=f"<b>{player_1_name} vs {player_2_name}</b>" if is_comparison_mode else f"<b>{player_1_name}</b>",
             x=0.5,
             y=0.95,
             font=dict(size=22, color=title_color, family="Arial", weight="bold"),
@@ -171,46 +176,45 @@ def plot_player_radar_chart(player_stats, player_name, theme="green", player_2_s
         font=dict(family="Arial")
     )
     
-    # Add performance indicators with improved styling
-    if player_stats:
-        # Calculate overall performance score
-        avg_score = sum(player_stats.get(cat[1], 0) for cat in categories) / len(categories)
+    # # Add performance indicators for single player view
+    # if not is_comparison_mode and player_1_stats:
+    #     # Calculate overall performance score
+    #     avg_score = sum(player_1_stats.get(cat[1], 0) for cat in categories) / len(categories)
         
-        # Performance level text with refined thresholds
-        if avg_score >= 85:
-            performance_text = "Elite"
-            performance_color = "#27ae60"
-        elif avg_score >= 70:
-            performance_text = "Excellent"
-            performance_color = "#2ecc71"
-        elif avg_score >= 55:
-            performance_text = "Good"
-            performance_color = "#f39c12"
-        elif avg_score >= 40:
-            performance_text = "Average"
-            performance_color = "#e67e22"
-        else:
-            performance_text = "Below Average"
-            performance_color = "#e74c3c"
+    #     # Performance level text with refined thresholds
+    #     if avg_score >= 85:
+    #         performance_text = "Elite"
+    #         performance_color = "#27ae60"
+    #     elif avg_score >= 70:
+    #         performance_text = "Excellent"
+    #         performance_color = "#2ecc71"
+    #     elif avg_score >= 55:
+    #         performance_text = "Good"
+    #         performance_color = "#f39c12"
+    #     elif avg_score >= 40:
+    #         performance_text = "Average"
+    #         performance_color = "#e67e22"
+    #     else:
+    #         performance_text = "Below Average"
+    #         performance_color = "#e74c3c"
         
-        # Add performance indicator with better styling
-        if not (player_2_stats and player_2_name):  # Only show for single player view
-            fig.add_annotation(
-                x=0.02, y=0.98,
-                xref="paper", yref="paper",
-                text=f"<b>Overall: {avg_score:.0f}/100</b><br><span style='color:{performance_color};font-weight:bold'>{performance_text}</span>",
-                showarrow=False,
-                font=dict(size=14, color=text_color, family="Arial"),
-                bgcolor="rgba(255,255,255,0.07)" if theme != "white" else "rgba(0,0,0,0.03)",
-                bordercolor=grid_color,
-                borderwidth=1,
-                borderpad=8,
-                align="left",
-                xanchor="left",
-                yanchor="top"
-            )
+    #     # Add performance indicator
+    #     fig.add_annotation(
+    #         x=0.02, y=0.98,
+    #         xref="paper", yref="paper",
+    #         text=f"<b>Overall: {avg_score:.0f}/100</b><br><span style='color:{performance_color};font-weight:bold'>{performance_text}</span>",
+    #         showarrow=False,
+    #         font=dict(size=14, color=text_color, family="Arial"),
+    #         bgcolor="rgba(255,255,255,0.07)" if theme != "white" else "rgba(0,0,0,0.03)",
+    #         bordercolor=grid_color,
+    #         borderwidth=1,
+    #         borderpad=8,
+    #         align="left",
+    #         xanchor="left",
+    #         yanchor="top"
+    #     )
     
-    # Add improved legend explaining what the scores mean
+    # Add score explanation
     fig.add_annotation(
         x=-0.12, y=-0.16,
         xref="paper", yref="paper",
@@ -908,3 +912,334 @@ def plot_pass_network_plotly(
             stats['most_key_passes'] = (most_key_passes_display_name, key_passes_counts.iloc[0], jersey)
 
     return fig, stats
+
+def normalize_coordinates_for_attacking_direction(events_df, team_name, matches_df):
+    """
+    Normalize coordinates so team always attacks left-to-right regardless of half
+    Uses empirical analysis with buffer zones to prevent inconsistent flipping for central players
+    """
+    normalized_events = events_df.copy()
+    
+    for match_id in events_df['match_id'].unique():
+        match_info = matches_df[matches_df['match_id'] == match_id]
+        if match_info.empty:
+            continue
+            
+        match_events = normalized_events[normalized_events['match_id'] == match_id]
+        
+        # IMPROVED LOGIC with buffer zones to prevent inconsistent flipping
+        period_avg_x = {}
+        period_counts = {}
+        
+        for period in [1, 2]:
+            period_events = match_events[match_events['period'] == period]
+            if period_events.empty:
+                continue
+                
+            x_positions = []
+            for _, event in period_events.iterrows():
+                if pd.notna(event.get('location')):
+                    try:
+                        loc = eval(event['location']) if isinstance(event['location'], str) else event['location']
+                        if loc and len(loc) >= 2:
+                            x_positions.append(loc[0])
+                    except:
+                        continue
+            
+            if x_positions:
+                period_avg_x[period] = sum(x_positions) / len(x_positions)
+                period_counts[period] = len(x_positions)
+        
+        # IMPROVED DECISION LOGIC with buffer zones
+        periods_to_flip = []
+        
+        for period, avg_x in period_avg_x.items():
+            event_count = period_counts.get(period, 0)
+            
+            # Use different thresholds based on how central the team's play is
+            # Teams with very central play (avg_x between 50-70) need stronger evidence to flip
+            if avg_x > 70:  # Clearly in opponent's half
+                periods_to_flip.append(period)
+            elif avg_x > 65 and event_count >= 20:  # Moderately in opponent's half with enough events
+                periods_to_flip.append(period)
+            elif avg_x > 60 and event_count >= 50:  # Slightly in opponent's half but with many events
+                periods_to_flip.append(period)
+            # If avg_x <= 60, don't flip (team is in own half or very central)
+        
+        # Additional consistency check: if one period flips, check if the other should too
+        # This helps with teams that have very different tactics between halves
+        if len(periods_to_flip) == 1 and len(period_avg_x) == 2:
+            flipped_period = periods_to_flip[0]
+            other_period = 3 - flipped_period  # If 1, gives 2; if 2, gives 1
+            
+            if other_period in period_avg_x:
+                other_avg_x = period_avg_x[other_period]
+                other_count = period_counts[other_period]
+                
+                # If the difference between periods is very large, flip both
+                avg_x_diff = abs(period_avg_x[flipped_period] - other_avg_x)
+                if avg_x_diff > 20 and other_count >= 20:  # Large positional difference
+                    periods_to_flip.append(other_period)
+        
+        # Extend to extra time periods
+        if 1 in periods_to_flip and 3 in match_events['period'].values:
+            periods_to_flip.append(3)
+        if 2 in periods_to_flip and 4 in match_events['period'].values:
+            periods_to_flip.append(4)
+        
+        # Apply coordinate flipping (only X-axis, keep Y-axis intact)
+        for idx, event in match_events.iterrows():
+            if pd.notna(event.get('location')):
+                try:
+                    loc = eval(event['location']) if isinstance(event['location'], str) else event['location']
+                    if loc and len(loc) >= 2:
+                        x, y = loc[0], loc[1]
+                        period = event.get('period', 1)
+                        
+                        if period in periods_to_flip:
+                            x = 120 - x
+                            # Keep Y coordinate unchanged to preserve left/right positioning
+                        
+                        # Update the location
+                        normalized_events.at[idx, 'location'] = str([x, y])
+                        
+                except:
+                    continue
+    
+    return normalized_events
+
+def plot_player_heatmap(all_events, team_name_1, player_name_1, team_name_2, player_name_2, theme="green", match_id=None):
+    """
+    Create two separate heat maps showing where two players were most active on the pitch
+    Returns two separate figures for side-by-side display
+    
+    Args:
+        team_name_1, player_name_1: First player details
+        team_name_2, player_name_2: Second player details
+        theme: Color theme
+        match_id: Specific match or None for tournament-wide
+    """
+    # Always require both players to be selected
+    if not player_name_1 or not player_name_2 or not team_name_1 or not team_name_2:
+        return None, None
+    
+    # Load matches data for coordinate normalization
+    from data_loader import load_data
+    _, matches, _, lineups, _, _, _, _ = load_data()
+    
+    # Filter events for both players
+    if match_id is not None:
+        player_1_events = all_events[
+            (all_events['match_id'] == match_id) & 
+            (all_events['team'] == team_name_1) & 
+            (all_events['player'] == player_name_1)
+        ]
+        player_2_events = all_events[
+            (all_events['match_id'] == match_id) & 
+            (all_events['team'] == team_name_2) & 
+            (all_events['player'] == player_name_2)
+        ]
+    else:
+        # Tournament-wide events
+        player_1_events = all_events[
+            (all_events['team'] == team_name_1) & 
+            (all_events['player'] == player_name_1)
+        ]
+        player_2_events = all_events[
+            (all_events['team'] == team_name_2) & 
+            (all_events['player'] == player_name_2)
+        ]
+    
+    if player_1_events.empty or player_2_events.empty:
+        return None, None
+    
+    # Normalize coordinates so team always attacks left-to-right
+    player_1_events = normalize_coordinates_for_attacking_direction(player_1_events, team_name_1, matches)
+    player_2_events = normalize_coordinates_for_attacking_direction(player_2_events, team_name_2, matches)
+    
+    # Extract locations from events
+    def extract_locations(events_df):
+        locations = []
+        for _, event in events_df.iterrows():
+            if pd.notna(event.get('location')):
+                try:
+                    loc = eval(event['location']) if isinstance(event['location'], str) else event['location']
+                    if loc and len(loc) >= 2:
+                        locations.append([loc[0], loc[1]])
+                except:
+                    continue
+        return pd.DataFrame(locations, columns=['x', 'y']) if locations else pd.DataFrame(columns=['x', 'y'])
+    
+    locations_df_1 = extract_locations(player_1_events)
+    locations_df_2 = extract_locations(player_2_events)
+    
+    if locations_df_1.empty or locations_df_2.empty:
+        return None, None
+    
+    # Use the same blue-based colormap for both players
+    if theme == "white":
+        colorscale = [
+            [0, 'rgba(255,255,255,0)'],
+            [0.1, 'rgba(173,216,230,0.4)'],
+            [0.25, 'rgba(100,149,237,0.5)'],
+            [0.45, 'rgba(30,144,255,0.6)'],
+            [0.65, 'rgba(255,255,0,0.7)'],
+            [0.8, 'rgba(255,165,0,0.8)'],
+            [0.92, 'rgba(255,69,0,0.9)'],
+            [1, 'rgba(220,20,60,1)']
+        ]
+    elif theme == "black":
+        colorscale = [
+            [0, 'rgba(0,0,0,0)'],
+            [0.1, 'rgba(70,130,180,0.4)'],
+            [0.25, 'rgba(100,149,237,0.5)'],
+            [0.45, 'rgba(0,191,255,0.6)'],
+            [0.65, 'rgba(255,255,0,0.7)'],
+            [0.8, 'rgba(255,165,0,0.8)'],
+            [0.92, 'rgba(255,69,0,0.9)'],
+            [1, 'rgba(220,20,60,1)']
+        ]
+    else:  # green
+        colorscale = [
+            [0, 'rgba(255,255,255,0)'],
+            [0.1, 'rgba(70,130,180,0.4)'],
+            [0.25, 'rgba(100,149,237,0.5)'],
+            [0.45, 'rgba(30,144,255,0.6)'],
+            [0.65, 'rgba(255,255,0,0.7)'],
+            [0.8, 'rgba(255,165,0,0.8)'],
+            [0.92, 'rgba(255,69,0,0.9)'],
+            [1, 'rgba(255,0,0,1)']
+        ]
+    
+    # Function to create a single heatmap figure
+    def create_single_heatmap(locations_df, player_name, team_name, player_num):
+        fig = go.Figure()
+        
+        # Add pitch elements
+        line_color = "white"
+        # Pitch outline
+        fig.add_shape(type="rect", x0=0, y0=0, x1=120, y1=80, line=dict(color=line_color, width=1.5))
+        # Center line
+        fig.add_shape(type="line", x0=60, y0=0, x1=60, y1=80, line=dict(color=line_color, width=1.5))
+        # Center circle
+        fig.add_shape(type="circle", x0=50, y0=30, x1=70, y1=50, line=dict(color=line_color, width=1.5))
+        fig.add_shape(type="circle", x0=59.5, y0=39.5, x1=60.5, y1=40.5, line=dict(color=line_color, width=1.5), fillcolor=line_color)
+        # Penalty areas
+        fig.add_shape(type="rect", x0=0, y0=18, x1=18, y1=62, line=dict(color=line_color, width=1.5))
+        fig.add_shape(type="rect", x0=102, y0=18, x1=120, y1=62, line=dict(color=line_color, width=1.5))
+        # 6-yard boxes
+        fig.add_shape(type="rect", x0=0, y0=30, x1=6, y1=50, line=dict(color=line_color, width=1.5))
+        fig.add_shape(type="rect", x0=114, y0=30, x1=120, y1=50, line=dict(color=line_color, width=1.5))
+        # Goals
+        fig.add_shape(type="rect", x0=-1.5, y0=36, x1=0, y1=44, line=dict(color=line_color, width=2))
+        fig.add_shape(type="rect", x0=120, y0=36, x1=121.5, y1=44, line=dict(color=line_color, width=2))
+        
+        # Generate heatmap data
+        x_bins = np.linspace(0, 120, 60)
+        y_bins = np.linspace(0, 80, 40) 
+        
+        hist, x_edges, y_edges = np.histogram2d(
+            locations_df['x'], locations_df['y'], 
+            bins=[x_bins, y_bins]
+        )
+        
+        from scipy.ndimage import gaussian_filter
+        hist_smoothed = gaussian_filter(hist, sigma=1.8)
+        
+        x_centers = (x_edges[:-1] + x_edges[1:]) / 2
+        y_centers = (y_edges[:-1] + y_edges[1:]) / 2
+        
+        hist_max = hist_smoothed.max()
+        if hist_max > 0:
+            hist_normalized = hist_smoothed / hist_max
+            hist_normalized = np.power(hist_normalized, 0.5)
+            hist_normalized = np.where(hist_normalized > 0, 
+                                     np.maximum(hist_normalized, 0.05), 
+                                     hist_normalized)
+            hist_normalized = hist_normalized * 0.9
+            hist_normalized = np.clip(hist_normalized, 0, 1)
+        else:
+            hist_normalized = hist_smoothed
+        
+        # Get player display name (nickname if available)
+        player_display_name = get_player_display_name(player_name, lineups)
+        
+        # Add heatmap with no labels on colorbar
+        if hist_max > 0:
+            fig.add_trace(go.Heatmap(
+                x=x_centers,
+                y=y_centers,
+                z=hist_normalized.T,
+                colorscale=colorscale,
+                showscale=True,
+                colorbar=dict(
+                    len=0.95,  # Make colorbar full height
+                    y=0.5,    # Center it vertically
+                    yanchor="middle",
+                    showticklabels=False,  # Hide tick labels
+                    x=1.02,  # Position colorbar
+                    thickness=15,  # Make colorbar thinner
+                    xpad=10  # Add some padding
+                ),
+                opacity=0.9,
+                name=player_display_name,
+                hoverinfo='skip'  # Remove hover information
+            ))
+            
+            # Add custom labels above and below the colorbar
+            # Position labels relative to the actual colorbar location
+            colorbar_center_x = 1.04  # Slightly to the right of colorbar
+            
+            # Add "High Activity" above colorbar
+            fig.add_annotation(
+                x=colorbar_center_x,
+                y=0.97,  # Top of the colorbar area
+                text="High Activity",
+                showarrow=False,
+                font=dict(size=10, color="white" if theme != "white" else "black"),
+                xanchor="center",
+                yanchor="bottom",
+                xref="paper",
+                yref="paper"
+            )
+            
+            # Add "Low Activity" below colorbar
+            fig.add_annotation(
+                x=colorbar_center_x,
+                y=0.03,  # Bottom of the colorbar area
+                text="Low Activity",
+                showarrow=False,
+                font=dict(size=10, color="white" if theme != "white" else "black"),
+                xanchor="center",
+                yanchor="top",
+                xref="paper",
+                yref="paper"
+            )
+        
+        # Update layout
+        fig.update_xaxes(range=[-2, 122], showgrid=False, zeroline=False, visible=False)
+        fig.update_yaxes(range=[-2, 82], showgrid=False, zeroline=False, visible=False)
+        
+        fig.update_layout(
+            title=dict(
+                text=f"{player_display_name} ({team_name})<br>",
+                x=0.5,
+                y=0.95,
+                font=dict(size=14, color="white" if theme != "white" else "black"),
+                xanchor="center"
+            ),
+            plot_bgcolor="#2d5e2e" if theme == "green" else ("#000000" if theme == "black" else "#f7f7f7"),
+            paper_bgcolor="#2d5e2e" if theme == "green" else ("#000000" if theme == "black" else "#f7f7f7"),
+            height=400,
+            width=600,
+            margin=dict(l=10, r=50, t=50, b=10),
+            showlegend=False
+        )
+        
+        return fig
+    
+    # Create two separate figures with the same colormap
+    fig1 = create_single_heatmap(locations_df_1, player_name_1, team_name_1, 1)
+    fig2 = create_single_heatmap(locations_df_2, player_name_2, team_name_2, 2)
+    
+    return fig1, fig2

@@ -13,7 +13,7 @@ from data_loader import (
     get_player_display_name,
     get_team_player_display_names
 )
-from visualizations import plotly_penalty_map_center_only, plot_pass_network_plotly, plot_player_radar_chart
+from visualizations import plotly_penalty_map_center_only, plot_pass_network_plotly, plot_player_radar_chart, plot_player_heatmap
 
 # --- Data Loading ---
 st.set_page_config(layout="wide")
@@ -102,13 +102,13 @@ with st.sidebar:
         min_passes = st.slider("Minimum number of passes", 1, max_passes_value, 6)
 
     elif view_option == "Player Analysis":
-        st.markdown("## Player Analysis Filters")
+        st.markdown("## Select Players to Compare")
         
-        # Team selection
+        # Team selection for Player 1
         all_teams = sorted(all_events['team'].dropna().unique())
-        selected_team = st.selectbox("Select Team", all_teams)
+        selected_team = st.selectbox("Select Team 1", all_teams)
         
-        # Player selection based on selected team
+        # Player 1 selection based on selected team
         if selected_team:
             team_players = sorted(all_events[all_events['team'] == selected_team]['player'].dropna().unique())
             
@@ -116,32 +116,33 @@ with st.sidebar:
             team_display_names = get_team_player_display_names(selected_team, lineups)
             
             # Create options with display names but keep original names as values
-            player_options = [team_display_names.get(player, player) for player in team_players]
+            player_options = ["None"] + [team_display_names.get(player, player) for player in team_players]
             player_name_mapping = {team_display_names.get(player, player): player for player in team_players}
+            player_name_mapping["None"] = None
             
-            selected_player_display = st.selectbox("Select Player", player_options)
+            selected_player_display = st.selectbox("Select Player 1", player_options)
             selected_player = player_name_mapping.get(selected_player_display, selected_player_display)
-            
-            # Add comparison option
-            compare_players = st.checkbox("Compare with another player")
-            
-            if compare_players:
-                # Allow selection from all teams for comparison
-                all_teams_2 = sorted(all_events['team'].dropna().unique())
-                selected_team_2 = st.selectbox("Select Second Team", all_teams_2, key="team_2")
-                
-                if selected_team_2:
-                    team_players_2 = sorted(all_events[all_events['team'] == selected_team_2]['player'].dropna().unique())
-                    
-                    # Get display names for second team
-                    team_display_names_2 = get_team_player_display_names(selected_team_2, lineups)
-                    player_options_2 = [team_display_names_2.get(player, player) for player in team_players_2]
-                    player_name_mapping_2 = {team_display_names_2.get(player, player): player for player in team_players_2}
-                    
-                    selected_player_2_display = st.selectbox("Select Second Player", player_options_2, key="player_2")
-                    selected_player_2 = player_name_mapping_2.get(selected_player_2_display, selected_player_2_display)
         else:
             selected_player = None
+        
+        # Team selection for Player 2
+        all_teams_2 = sorted(all_events['team'].dropna().unique())
+        selected_team_2 = st.selectbox("Select Team 2", all_teams_2, key="team_2")
+        
+        # Player 2 selection based on selected team 2
+        if selected_team_2:
+            team_players_2 = sorted(all_events[all_events['team'] == selected_team_2]['player'].dropna().unique())
+            
+            # Get display names for second team
+            team_display_names_2 = get_team_player_display_names(selected_team_2, lineups)
+            player_options_2 = ["None"] + [team_display_names_2.get(player, player) for player in team_players_2]
+            player_name_mapping_2 = {team_display_names_2.get(player, player): player for player in team_players_2}
+            player_name_mapping_2["None"] = None
+            
+            selected_player_2_display = st.selectbox("Select Player 2", player_options_2, key="player_2")
+            selected_player_2 = player_name_mapping_2.get(selected_player_2_display, selected_player_2_display)
+        else:
+            selected_player_2 = None
 
 # --- Main Panel ---
 st.title(view_option)
@@ -225,20 +226,29 @@ if view_option == "Shot Map":
     )
     if fig_data:
         fig, total, goals, not_goals, goal_rate, miss_types, body_part_counts, is_penalty, shootout_count, regular_count = fig_data
-        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-        # Compact KPIs and summaries in columns
-        counts_col, body_col, miss_col, pattern_col = st.columns([1.2,1.2,1.2,1.2])
-        with counts_col:
-            st.markdown(f"### Counts")
+        
+        # New 5-column layout: 2 narrow stats | larger goal visualization | 2 narrow stats
+        left_col1, left_col2, center_col, right_col1, right_col2 = st.columns([0.5, 0.5, 3, 0.5, 0.5])
+        
+        # Left side stats
+        with left_col1:
+            st.markdown("### Counts")
             st.markdown(f"**{shot_type_label}: {total}**")
             st.markdown(f"**Goals: {goals} ({goal_rate:.1f}%)**")
             st.markdown(f"**No Goals: {not_goals} ({100 - goal_rate:.1f}%)**")
-        with body_col:
+        
+        with left_col2:
             st.markdown("### Body Part")
             for part, count in body_part_counts.items():
                 st.markdown(f"{part}: {count}")
-        with pattern_col:
-            st.markdown(f"### Situation")
+        
+        # Center - larger goal visualization
+        with center_col:
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+        
+        # Right side stats
+        with right_col1:
+            st.markdown("### Situation")
             play_pattern_counts = filtered_shots['play_pattern'].value_counts().sort_values(ascending=False)
             for pattern, count in play_pattern_counts.items():
                 if pattern == 'Other':
@@ -248,11 +258,12 @@ if view_option == "Shot Map":
                 else:
                     st.markdown(f"{pattern}: {count}")
             if is_penalty:
-                st.markdown(f"### Type of Play")
+                st.markdown("### Type of Play")
                 st.markdown(f"Shootout: {shootout_count}")
                 st.markdown(f"Regular: {regular_count}")
-        with miss_col:  
-            st.markdown(f"### Miss Types")
+        
+        with right_col2:
+            st.markdown("### Miss Types")
             for miss_type, count in miss_types.items():
                 label = "Off Target" if miss_type == "Off T" else miss_type
                 st.markdown(f"{label}: {count}")
@@ -361,33 +372,30 @@ elif view_option == "Pass Network":
         st.info("Please select a team from the sidebar to view the pass network.")
 
 elif view_option == "Player Analysis":
-    if selected_team and selected_player:
-        col1, col2, col3 = st.columns([1, 2, 1])
-        
-        with col2:
-            # Calculate tournament-wide player radar stats for first player
+    # Check if both players are selected
+    both_players_selected = (selected_team and selected_player and 
+                           selected_team_2 and selected_player_2)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        if both_players_selected:
+            # Calculate tournament-wide player radar stats for both players
             player_stats = calculate_player_radar_stats(
                 all_events, passes_euro, shots_euro, 
                 None, selected_team, selected_player
             )
             
-            if player_stats:
-                # Get all players from both teams for normalization if comparing
-                if compare_players and selected_player_2:
-                    # Get players from both teams for proper normalization
-                    all_team_players = list(all_events[all_events['team'] == selected_team]['player'].dropna().unique())
-                    if selected_team_2:
-                        all_team_players.extend(all_events[all_events['team'] == selected_team_2]['player'].dropna().unique())
-                    all_team_players = list(set(all_team_players))  # Remove duplicates
-                    
-                    # Calculate stats for second player
-                    player_stats_2 = calculate_player_radar_stats(
-                        all_events, passes_euro, shots_euro, 
-                        None, selected_team_2, selected_player_2
-                    )
-                else:
-                    all_team_players = all_events[all_events['team'] == selected_team]['player'].dropna().unique()
-                    player_stats_2 = None
+            player_stats_2 = calculate_player_radar_stats(
+                all_events, passes_euro, shots_euro, 
+                None, selected_team_2, selected_player_2
+            )
+            
+            if player_stats and player_stats_2:
+                # Get players from both teams for proper normalization
+                all_team_players = list(all_events[all_events['team'] == selected_team]['player'].dropna().unique())
+                all_team_players.extend(all_events[all_events['team'] == selected_team_2]['player'].dropna().unique())
+                all_team_players = list(set(all_team_players))  # Remove duplicates
                 
                 # Calculate stats for all players for proper normalization
                 all_player_stats = {}
@@ -405,90 +413,96 @@ elif view_option == "Player Analysis":
                 # Normalize stats
                 normalized_stats = normalize_radar_stats(all_player_stats)
                 selected_player_normalized = normalized_stats.get(selected_player, {})
+                selected_player_2_normalized = normalized_stats.get(selected_player_2, {})
                 
-                # Create radar chart (single or comparison)
-                if compare_players and selected_player_2 and player_stats_2:
-                    selected_player_2_normalized = normalized_stats.get(selected_player_2, {})
-                    
-                    # Use display names for chart
-                    player_1_display = get_player_display_name(selected_player, lineups)
-                    player_2_display = get_player_display_name(selected_player_2, lineups)
-                    
-                    fig = plot_player_radar_chart(
-                        selected_player_normalized, player_1_display, theme,
-                        player_2_stats=selected_player_2_normalized, 
-                        player_2_name=player_2_display
-                    )
-                    chart_title = f"### {player_1_display} vs {player_2_display} - Tournament Performance"
-                else:
-                    player_1_display = get_player_display_name(selected_player, lineups)
-                    fig = plot_player_radar_chart(selected_player_normalized, player_1_display, theme)
-                    chart_title = f"### {player_1_display} - {selected_team} Tournament Performance"
+                # Use display names for chart
+                player_1_display = get_player_display_name(selected_player, lineups)
+                player_2_display = get_player_display_name(selected_player_2, lineups)
+                
+                # Create comparison radar chart
+                fig = plot_player_radar_chart(
+                    selected_player_normalized, player_1_display,
+                    selected_player_2_normalized, player_2_display, theme
+                )
+                chart_title = f"###  Tournament Performance"
                 
                 if fig:
                     st.markdown(chart_title)
-                    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+                    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False}, key="radar_comparison")
                 else:
-                    st.error("Could not generate radar chart for this player.")
+                    st.error("Could not generate radar chart for these players.")
             else:
-                st.error("No data available for this player in the tournament.")
-        
-        with col1:
-            if player_stats:
-                # Get display names for both players
-                player_1_display = get_player_display_name(selected_player, lineups)
-                
-                if compare_players and selected_player_2 and player_stats_2:
-                    player_2_display = get_player_display_name(selected_player_2, lineups)
-                    st.markdown("### Tournament Statistics (Per 90)")
-                    st.markdown(f"**{player_1_display}** ({selected_team}) **vs** **{player_2_display}** ({selected_team_2})")
-                    st.metric("Total Minutes", f"{player_stats.get('minutes_played', 0):.0f} / {player_stats_2.get('minutes_played', 0):.0f}")
-                    st.metric("Passes per 90", f"{player_stats.get('passes_per_90', 0):.1f} / {player_stats_2.get('passes_per_90', 0):.1f}")
-                    st.metric("Pass Accuracy", f"{player_stats.get('pass_accuracy', 0):.1f}% / {player_stats_2.get('pass_accuracy', 0):.1f}%")
-                    st.metric("Progressive Passes per 90", f"{player_stats.get('progressive_passes_per_90', 0):.1f} / {player_stats_2.get('progressive_passes_per_90', 0):.1f}")
-                    st.metric("Key Passes per 90", f"{player_stats.get('key_passes_per_90', 0):.1f} / {player_stats_2.get('key_passes_per_90', 0):.1f}")
-                    st.metric("Successful Dribbles per 90", f"{player_stats.get('dribbles_completed_per_90', 0):.1f} / {player_stats_2.get('dribbles_completed_per_90', 0):.1f}")
-                    st.metric("Shots per 90", f"{player_stats.get('shots_per_90', 0):.1f} / {player_stats_2.get('shots_per_90', 0):.1f}")
-                    st.metric("Goals per 90", f"{player_stats.get('goals_per_90', 0):.2f} / {player_stats_2.get('goals_per_90', 0):.2f}")
-                    st.metric("Assists per 90", f"{player_stats.get('assists_per_90', 0):.2f} / {player_stats_2.get('assists_per_90', 0):.2f}")
-                    st.metric("Non-Penalty G+A", f"{player_stats.get('non_penalty_g_a', 0)} ({player_stats.get('non_penalty_xg_xa', 0):.2f}) / {player_stats_2.get('non_penalty_g_a', 0)} ({player_stats_2.get('non_penalty_xg_xa', 0):.2f})")
-                else:
-                    st.markdown("### Tournament Statistics (Per 90)")
-                    st.markdown(f"**{player_1_display}** ({selected_team})")
-                    st.metric("Total Minutes", f"{player_stats.get('minutes_played', 0):.0f}")
-                    st.metric("Passes per 90", f"{player_stats.get('passes_per_90', 0):.1f}")
-                    st.metric("Pass Accuracy", f"{player_stats.get('pass_accuracy', 0):.1f}%")
-                    st.metric("Progressive Passes per 90", f"{player_stats.get('progressive_passes_per_90', 0):.1f}")
-                    st.metric("Key Passes per 90", f"{player_stats.get('key_passes_per_90', 0):.1f}")
-                    st.metric("Successful Dribbles per 90", f"{player_stats.get('dribbles_completed_per_90', 0):.1f}")
-                    st.metric("Shots per 90", f"{player_stats.get('shots_per_90', 0):.1f}")
-                    st.metric("Goals per 90", f"{player_stats.get('goals_per_90', 0):.2f}")
-                    st.metric("Assists per 90", f"{player_stats.get('assists_per_90', 0):.2f}")
-                    st.metric("Non-Penalty G+A", f"{player_stats.get('non_penalty_g_a', 0)} ({player_stats.get('non_penalty_xg_xa', 0):.2f})")
+                st.error("No data available for one or both players in the tournament.")
+        else:
+            # Show empty radar chart placeholder
+            st.markdown("### Player Comparison - Tournament Performance")
+            st.info("Please select both players to view the radar chart comparison.")
+    
+    with col1:
+        if both_players_selected and player_stats and player_stats_2:
+            # Get display names for both players
+            player_1_display = get_player_display_name(selected_player, lineups)
+            player_2_display = get_player_display_name(selected_player_2, lineups)
+            
+            st.markdown("### Tournament Statistics")
+            st.markdown(f"**{player_1_display}** ({selected_team}) **vs** **{player_2_display}** ({selected_team_2})")
+            st.metric("Total Minutes", f"{player_stats.get('minutes_played', 0):.0f} / {player_stats_2.get('minutes_played', 0):.0f}")
+            st.metric("Passes per 90", f"{player_stats.get('passes_per_90', 0):.1f} / {player_stats_2.get('passes_per_90', 0):.1f}")
+            st.metric("Pass Accuracy", f"{player_stats.get('pass_accuracy', 0):.1f}% / {player_stats_2.get('pass_accuracy', 0):.1f}%")
+            st.metric("Key Passes per 90", f"{player_stats.get('key_passes_per_90', 0):.1f} / {player_stats_2.get('key_passes_per_90', 0):.1f}")
+            st.metric("Successful Dribbles per 90", f"{player_stats.get('dribbles_completed_per_90', 0):.1f} / {player_stats_2.get('dribbles_completed_per_90', 0):.1f}")
+            st.metric("Goals (xG) per 90", f"{player_stats.get('goals_per_90', 0):.2f} ({player_stats.get('xg_per_90', 0):.2f}) / {player_stats_2.get('goals_per_90', 0):.2f} ({player_stats_2.get('xg_per_90', 0):.2f})")
+            st.metric("Assists (xA) per 90", f"{player_stats.get('assists_per_90', 0):.2f} ({player_stats.get('expected_assists_per_90', 0):.2f}) / {player_stats_2.get('assists_per_90', 0):.2f} ({player_stats_2.get('expected_assists_per_90', 0):.2f})")
+        else:
+            st.markdown("### Tournament Statistics")
+            st.info("Please select both players to view statistics.")
 
-        with col3:
-            if player_stats:
-                # Get display names for both players
-                player_1_display = get_player_display_name(selected_player, lineups)
-                
-                if compare_players and selected_player_2 and player_stats_2:
-                    player_2_display = get_player_display_name(selected_player_2, lineups)
-                    st.markdown("### Defensive Actions (Per 90)")
-                    st.markdown(f"**{player_1_display}** ({selected_team}) **vs** **{player_2_display}** ({selected_team_2})")
-                    st.metric("Tackles per 90", f"{player_stats.get('tackles_per_90', 0):.1f} / {player_stats_2.get('tackles_per_90', 0):.1f}")
-                    st.metric("Interceptions per 90", f"{player_stats.get('interceptions_per_90', 0):.1f} / {player_stats_2.get('interceptions_per_90', 0):.1f}")
-                    st.metric("Recoveries per 90", f"{player_stats.get('recoveries_per_90', 0):.1f} / {player_stats_2.get('recoveries_per_90', 0):.1f}")
-                    st.metric("Blocks per 90", f"{player_stats.get('blocks_per_90', 0):.1f} / {player_stats_2.get('blocks_per_90', 0):.1f}")
-                    st.metric("Clearances per 90", f"{player_stats.get('clearances_per_90', 0):.1f} / {player_stats_2.get('clearances_per_90', 0):.1f}")
-                    st.metric("50/50s Won per 90", f"{player_stats.get('50_50s_won_per_90', 0):.1f} / {player_stats_2.get('50_50s_won_per_90', 0):.1f}")
-                else:
-                    st.markdown("### Defensive Actions (Per 90)")
-                    st.markdown(f"**{player_1_display}** ({selected_team})")
-                    st.metric("Tackles per 90", f"{player_stats.get('tackles_per_90', 0):.1f}")
-                    st.metric("Interceptions per 90", f"{player_stats.get('interceptions_per_90', 0):.1f}")
-                    st.metric("Recoveries per 90", f"{player_stats.get('recoveries_per_90', 0):.1f}")
-                    st.metric("Blocks per 90", f"{player_stats.get('blocks_per_90', 0):.1f}")
-                    st.metric("Clearances per 90", f"{player_stats.get('clearances_per_90', 0):.1f}")
-                    st.metric("50/50s Won per 90", f"{player_stats.get('50_50s_won_per_90', 0):.1f}")
+    with col3:
+        if both_players_selected and player_stats and player_stats_2:
+            # Get display names for both players
+            player_1_display = get_player_display_name(selected_player, lineups)
+            player_2_display = get_player_display_name(selected_player_2, lineups)
+            
+            st.markdown("### Defensive Actions (Per 90)")
+            st.markdown(f"**{player_1_display}** ({selected_team}) **vs** **{player_2_display}** ({selected_team_2})")
+            st.metric("Tackles per 90", f"{player_stats.get('tackles_per_90', 0):.1f} / {player_stats_2.get('tackles_per_90', 0):.1f}")
+            st.metric("Interceptions per 90", f"{player_stats.get('interceptions_per_90', 0):.1f} / {player_stats_2.get('interceptions_per_90', 0):.1f}")
+            st.metric("Recoveries per 90", f"{player_stats.get('recoveries_per_90', 0):.1f} / {player_stats_2.get('recoveries_per_90', 0):.1f}")
+            st.metric("Blocks per 90", f"{player_stats.get('blocks_per_90', 0):.1f} / {player_stats_2.get('blocks_per_90', 0):.1f}")
+            st.metric("Clearances per 90", f"{player_stats.get('clearances_per_90', 0):.1f} / {player_stats_2.get('clearances_per_90', 0):.1f}")
+            st.metric("50/50s Won per 90", f"{player_stats.get('50_50s_won_per_90', 0):.1f} / {player_stats_2.get('50_50s_won_per_90', 0):.1f}")
+        else:
+            st.markdown("### Defensive Actions (Per 90)")
+            st.info("Please select both players to view defensive statistics.")
+    
+    # Always show heatmap section
+    st.markdown("---")
+    st.markdown("### Player Heatmaps ")
+    
+    if both_players_selected:
+        heatmap_result = plot_player_heatmap(
+            all_events, selected_team, selected_player, selected_team_2, selected_player_2, theme
+        )
+        
+        if heatmap_result and heatmap_result[0] and heatmap_result[1]:
+            fig1, fig2 = heatmap_result
+            
+            # Display the two heatmaps side by side with unique keys
+            col_heat1, col_heat2 = st.columns(2)
+            
+            with col_heat1:
+                st.plotly_chart(fig1, use_container_width=True, config={"displayModeBar": False}, key="heatmap_player_1")
+            
+            with col_heat2:
+                st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False}, key="heatmap_player_2")
+        else:
+            st.warning("No location data available for heatmap comparison.")
     else:
-        st.info("Please select a team and player from the sidebar to view the player analysis.")
+        # Show empty heatmap placeholders
+        col_heat1, col_heat2 = st.columns(2)
+        
+        with col_heat1:
+            st.info("Select Player 1 to view heatmap")
+        
+        with col_heat2:
+            st.info("Select Player 2 to view heatmap")
